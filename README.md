@@ -4,11 +4,11 @@ structure-validated
 Handles structured values validated according to administrators defined rules right from nice end-user interface
 
 Packagist statistics by poser.pugx.org
-[![Latest Stable Version](https://poser.pugx.org/danielgp/structure-validated/v/stable)](https://packagist.org/packages/danielgp/salariu)
-[![Total Downloads](https://poser.pugx.org/danielgp/structure-validated/downloads)](https://packagist.org/packages/danielgp/salariu)
-[![License](https://poser.pugx.org/danielgp/structure-validated/license)](https://packagist.org/packages/danielgp/salariu)
-[![Monthly Downloads](https://poser.pugx.org/danielgp/structure-validated/d/monthly)](https://packagist.org/packages/danielgp/salariu)
-[![Daily Downloads](https://poser.pugx.org/danielgp/structure-validated/d/daily)](https://packagist.org/packages/danielgp/salariu)
+[![Latest Stable Version](https://poser.pugx.org/danielgp/structure-validated/v/stable)](https://packagist.org/packages/danielgp/structure-validated)
+[![Total Downloads](https://poser.pugx.org/danielgp/structure-validated/downloads)](https://packagist.org/packages/danielgp/structure-validated)
+[![License](https://poser.pugx.org/danielgp/structure-validated/license)](https://packagist.org/packages/danielgp/structure-validated)
+[![Monthly Downloads](https://poser.pugx.org/danielgp/structure-validated/d/monthly)](https://packagist.org/packages/danielgp/structure-validated)
+[![Daily Downloads](https://poser.pugx.org/danielgp/structure-validated/d/daily)](https://packagist.org/packages/danielgp/structure-validated)
 
 Code quality analysis
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/danielgp/structure-validated/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/danielgp/structure-validated/?branch=master)
