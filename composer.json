@@ -1,0 +1,51 @@
+{
+    "name": "danielgp/structure-validated",
+    "description": "Handles structured values validated according to administrators defined rules right from nice end-user interface",
+    "type": "application",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Popiniuc",
+            "email": "danielpopiniuc@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.0 || ^7.1",
+        "components/flag-icon-css": ">=2.8.0",
+        "danielgp/common-lib": ">=3.0",
+        "danielgp/common-styles": ">=1.1.6",
+        "fortawesome/font-awesome": ">=4.7",
+        "gettext/gettext": ">=4.3",
+        "phpoffice/phpexcel": ">=1.8"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*",
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "frenck/php-compatibility": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "danielgp\\structure_validated\\": "danielgp/structure-validated/",
+            "danielgp\\common_lib\\": "vendor/danielgp/common-lib/"
+        },
+        "classmap": [
+            "sources/Basic.php",
+            "sources/StructureValidated.php"
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "archive": {
+        "exclude": [
+            ".gitignore",
+            "*.bat",
+            "*.po",
+            "*.vbs",
+            "/.projectKnowledge",
+            "/nbproject",
+            "/vendor",
+            "/tests"
+        ]
+    }
+}

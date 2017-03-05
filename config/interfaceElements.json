@@ -1,0 +1,22 @@
+{
+    "Application": {
+        "Available Languages": {
+            "en_US": "US English",
+            "ro_RO": "Română"
+        },
+        "Components": {
+            "Cascade Style Sheets": [
+                "vendor/components/flag-icon-css/css/flag-icon.min.css",
+                "vendor/fortawesome/font-awesome/css/font-awesome.min.css",
+                "public_html/css/structure-validated-style.css"
+            ],
+            "JavaScript": [
+                "vendor/danielgp/common-lib/js/tabber/tabber-management.min.js",
+                "vendor/danielgp/common-lib/js/tabber/tabber.min.js"
+            ]
+        },
+        "Copyright Holder": "Daniel Popiniuc",
+        "Default Language": "en_US",
+        "Name": "Structure-Validated"
+    }
+}
