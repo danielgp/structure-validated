@@ -19,7 +19,7 @@ Code quality analysis
 Feature Name | Status Date | Status
 ------------ | ----------- | ------
 Mass-upload values to dimension tables | March 6th, 2017 | Planned
-Display existing values from dimension tables | March 6th, 2017 | Planned
+Display existing values from dimension tables | March 6th, 2017 | WIP
 Manually add 1 value to dimension/x-reference table of choice | March 6th, 2017 | Planned
 Manually modify 1 value from dimension/x-reference table of choice | March 6th, 2017 | Planned
 Manually delete unused values from dimension/x-reference table of choice | March 6th, 2017 | Planned
@@ -27,7 +27,7 @@ Load values into target table containing a series of dimensions | March 6th, 201
 Keep track of any values loading so it can be corrected/reloaded/removed later on | March 6th, 2017 | Planned
 Ability to add/modify/delete validations from interface for values loading | March 6th, 2017 | Planned
 Lock-down ability to do any kind of manipulation on data assigned to "Target Scenario" (time range) | March 6th, 2017 | Planned
-Multi-Language (start w. English and Romanian) | March 6th, 2017 | Planned
+Multi-Language (start w. English and Romanian) | March 6th, 2017 | WIP
 
 ## Used references
 
