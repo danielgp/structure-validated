@@ -11,12 +11,87 @@
                 "public_html/css/structure-validated-style.css"
             ],
             "JavaScript": [
+                "vendor/danielgp/common-lib/js/datetimepicker/datetimepicker.locale.LC_CT.min.js",
+                "vendor/danielgp/common-lib/js/datetimepicker/datetimepicker.min.js",
+                "vendor/components/jquery/jquery.min.js",
+                "public_html/js/jQueryUI/jquery-ui.min.js",
+                "public_html/js/jQueryUI/jquery.ui.touch-punch.min.js",
+                "public_html/js/MultiLevelPushMenu/jquery.multilevelpushmenu.min.js",
                 "vendor/danielgp/common-lib/js/tabber/tabber-management.min.js",
                 "vendor/danielgp/common-lib/js/tabber/tabber.min.js"
             ]
         },
         "Copyright Holder": "Daniel Popiniuc",
-        "Default Language": "en_US",
+        "Default Language": "ro_RO",
+        "Locale To ISO3": {
+            "en_US": "enu",
+            "ro_RO": "rom"
+        },
         "Name": "Structure-Validated"
+    },
+    "Database": {
+        "database": "structure_validated",
+        "host": "127.0.0.1",
+        "password": "YoTi3kh9RgHMCEtFgzuWCcxMPooEkA",
+        "port": "3306",
+        "username": "web_sv"
+    },
+    "Interface": {
+        "Gradients To Action": {
+            "add": "gradientLightBlueDiagonal",
+            "edit": "gradientLightGreenDiagonal"
+        }
+    },
+    "Menu": {
+        "Definitions": {
+            "Icon": "fa fa-cogs",
+            "ID": "Definitions",
+            "Parent": true
+        },
+        "Field": {
+            "Icon": "fa fa-envira",
+            "ID": "FieldID",
+            "LinkPrefix": "?action=list&amp;ID=",
+            "Parent": "Definitions",
+            "QueryListing": "ValidationFieldList",
+            "Table": "validation_field"
+        },
+        "Market": {
+            "Icon": "fa fa-empire",
+            "ID": "MarketID",
+            "LinkPrefix": "?action=list&amp;ID=",
+            "Parent": "Definitions",
+            "QueryListing": "DimensionMarketList",
+            "Table": "dimension_market"
+        },
+        "Information Source": {
+            "Icon": "fa fa-info",
+            "ID": "InformationSourceID",
+            "LinkPrefix": "?action=list&amp;ID=",
+            "Parent": "Definitions",
+            "QueryListing": "InformationSourceList",
+            "Table": "dimension_information_source"
+        },
+        "Target Scenario": {
+            "Icon": "fa fa-handshake-o",
+            "ID": "TargetScenarioID",
+            "LinkPrefix": "?action=list&amp;ID=",
+            "Parent": "Definitions",
+            "QueryListing": "TargetScenarioList",
+            "Table": "dimension_target_scenario"
+        },
+        "Template Type": {
+            "Icon": "fa fa-codepen",
+            "ID": "TemplateTypeID",
+            "LinkPrefix": "?action=list&amp;ID=",
+            "Parent": "Definitions",
+            "QueryListing": "TemplateTypeList",
+            "Table": "template_type"
+        },
+        "Data Load": {
+            "Icon": "fa fa-upload",
+            "ID": "DataLoad",
+            "Parent": true
+        }
     }
 }
