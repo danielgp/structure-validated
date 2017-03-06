@@ -37,11 +37,12 @@ trait Basic
 
     protected $tApp = null;
 
-    private function handleLocalizationStructureValidated($appSettings)
+    protected function handleLocalizationStructureValidated($appSettings)
     {
         $this->handleLocalizationStructureValidatedInputsIntoSession($appSettings);
         $this->handleLocalizationStructureValidatedSafe($appSettings);
-        $localizationFile = __DIR__ . '\\locale\\' . $this->tCmnSession->get('lang') . '\\LC_MESSAGES\\structure-validated.mo';
+        $localizationFile = __DIR__ . '\\locale\\' . $this->tCmnSession->get('lang')
+            . '\\LC_MESSAGES\\structure-validated.mo';
         $translations     = new \Gettext\Translations;
         $translations->addFromMoFile($localizationFile);
         $this->tApp       = new \Gettext\Translator();
@@ -69,6 +70,24 @@ trait Basic
         }
     }
 
+    protected function localeSV($inputString)
+    {
+        return $this->tApp->gettext(htmlspecialchars($inputString));
+    }
+
+    protected function localeSVextended($inputString, $features = null)
+    {
+        if (isset($features['prefix'])) {
+            $translated = $this->localeSV($features['prefix'] . $inputString);
+            if ($translated === $features['prefix'] . $inputString) {
+                $sReturn = $inputString;
+            } else {
+                $sReturn = $translated;
+            }
+        }
+        return $sReturn;
+    }
+
     /**
      * returns an array with non-standard holidays from a JSON file
      *
@@ -84,22 +103,81 @@ trait Basic
         return json_decode($jSonContent, true);
     }
 
-    private function setFooterHtml($appSettings)
+    protected function setFieldLocalized($tblName, $fldName)
     {
-        return $this->setFooterCommon($this->setUpperRightBoxLanguages($appSettings['Available Languages'])
-                . '<div class="resetOnly author">&copy; ' . date('Y') . ' '
-                . $appSettings['Copyright Holder'] . '</div>');
+        return ' AS `' . $this->localeSV('i18n_MySQL_Field__' . $tblName . '|' . $fldName) . '`';
     }
 
-    private function setHeaderHtml($appSettings)
+    protected function setFooterHtml($appSettings)
     {
-        $headerParameters = [
+        return '</section>' . $this->setFooterCommon(''
+                . $this->setUpperRightBoxLanguages($appSettings['Available Languages'])
+                . '<footer class="resetOnly author">&copy; ' . $appSettings['Copyright Holder'] . ', ' . date('Y')
+                . '</footer>');
+    }
+
+    protected function setHeaderHtml($appSettings, $menuSettings)
+    {
+        $appSettings['Components']['JavaScript'][0] = str_replace('LC_CT', $appSettings['Locale To ISO3'
+            . ''][$this->tCmnSession->get('lang')], $appSettings['Components']['JavaScript'][0]);
+        $headerParameters                           = [
             'css'        => $appSettings['Components']['Cascade Style Sheets'],
             'javascript' => $appSettings['Components']['JavaScript'],
             'lang'       => str_replace('_', '-', $this->tCmnSession->get('lang')),
             'title'      => $appSettings['Name'],
         ];
         return $this->setHeaderCommon($headerParameters)
-            . '<h1>' . $appSettings['Name'] . '</h1>';
+            . '<div id="SVmenu">' . $this->setMenu($menuSettings) . '</div><!-- main-menu end -->' . $this->setMenuJS()
+            . '<header id="PageHeader">' . '<h1>' . $appSettings['Name'] . '</h1>' . '</header>'
+            . '<section id="ContentContainer">';
+    }
+
+    private function setMenu($menuSettings)
+    {
+        $sReturn    = null;
+        $remembered = null;
+        foreach ($menuSettings as $value) {
+            if ($value['Parent'] === true) {
+                $sReturn[] = (!is_null($remembered) ? '</ul></li>' : '')
+                    . '<li><a href="#"><i class="' . $value['Icon'] . '"></i>'
+                    . $this->localeSVextended($value['ID'], ['prefix' => 'i18n_MenuItem_']) . '</a>';
+            } else {
+                if ($value['Parent'] == $remembered['ID']) {
+                    $sReturn[] = '<h2><i class="' . $remembered['Icon'] . '"></i>'
+                        . $this->localeSVextended($remembered['ID'], ['prefix' => 'i18n_MenuItem_']) . '</h2><ul>';
+                }
+                $sReturn[] = '<li><a href="' . $value['LinkPrefix'] . $value['ID'] . '&amp;T=' . $value['Table']
+                    . '&amp;Q=' . $value['QueryListing'] . '">'
+                    . '<i class="' . $value['Icon'] . '"></i>'
+                    . $this->localeSVextended($value['ID'], ['prefix' => 'i18n_MenuItem_']) . '</a></li>';
+            }
+            $remembered = $value;
+        }
+        return '<div id="SHmenu"><nav><h2><i class="fa fa-home"></i>&nbsp;</h2>'
+            . '<ul>' . implode('', $sReturn) . '</li></ul></nav></div><!-- SHmenu end -->';
+    }
+
+    private function setMenuJS()
+    {
+        return $this->setJavascriptContent(implode('', [
+                '$("#SHmenu").css("visibility", "hidden");',
+                '$(document).ready(function(){',
+                ' $("#SHmenu").multilevelpushmenu({',
+                implode(',', [
+                    'backItemClass: "backItemClass"',
+                    'backItemIcon: "fa fa-angle-right"',
+                    'backText: "' . $this->localeSV('i18n_Back') . '"',
+                    'collapsed: true',
+                    'containersToPush: [$("#PageHeader"),$("#ContentContainer")]',
+                    'fullCollapse: false',
+                    'groupIcon: "fa fa-angle-left"',
+                    'menuWidth: 300',
+                    'mode: "overlap"',
+                    'preventItemClick: false',
+                ]),
+                ' });',
+                ' $("#SHmenu").css("visibility", "visible");',
+                '});',
+        ]));
     }
 }
