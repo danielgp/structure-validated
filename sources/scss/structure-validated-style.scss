@@ -35,11 +35,39 @@ THE SOFTWARE.
 @import "../../vendor/danielgp/common-styles/scss/tabber.scss";
 @import "../../vendor/danielgp/common-styles/scss/table.scss";
 @import "../../vendor/danielgp/common-styles/scss/upperRightBox.scss";
+@import "jquery.multilevelpushmenu.min.scss";
+@import "jquery-ui.sortable";
+// and some specific tweaks for current application
 h1 {
     font-size: xx-large;
 }
-.author {
+header {
+    @include box-shadow(0px, 3px, 3px, #ccc);
+    margin:0px 0px 0px 40px;
+    padding: 0px 0px 2px 5px;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    z-index: 900;
+}
+footer {
+    @extend .gradientBlueGlossy;
+    @include box-shadow(0px, 0px, 10px, #999);
+    bottom: 0px;
     font-weight: bold;
-    font-size: larger;
+    font-size: smaller;
+    padding: 5px;
+    position: fixed;
     text-align: center;
+    width: 100%;
+    z-index: 100;
+}
+#ContentContainer {
+    margin: 45px 5px 5px 45px;
+    float: left;
+}
+#SVmenu {
+    height: 100%;
+    position: absolute;
+    z-index: 900;
 }
