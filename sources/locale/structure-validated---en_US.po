@@ -6,15 +6,58 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: structure-validated\n"
-"POT-Creation-Date: 2017-03-05 17:09+0200\n"
-"PO-Revision-Date: 2017-03-06 01:20+0200\n"
-"Last-Translator: <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2017-03-07 00:11+0200\n"
+"PO-Revision-Date: 2017-03-07 00:11+0200\n"
+"Last-Translator: Daniel Popiniuc <danielpopiniuc@gmail.com>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.12\n"
 
 msgid "i18n_WIP"
 msgstr "WIP (Work In Progress)"
+
+msgid "i18n_Back"
+msgstr "Back"
+
+msgid "i18n_ValuesDetails"
+msgstr "Record details"
+
+msgid "i18n_ValuesList"
+msgstr "List of all records"
+
+msgid "i18n_MenuItem_DataLoad"
+msgstr "Data Load"
+
+msgid "i18n_MenuItem_Definitions"
+msgstr "Definitions"
+
+msgid "i18n_MenuItem_FieldID"
+msgstr "Field (as information)"
+
+msgid "i18n_MenuItem_InformationSourceID"
+msgstr "Information Source"
+
+msgid "i18n_MenuItem_MarketID"
+msgstr "Market"
+
+msgid "i18n_MenuItem_TargetScenarioID"
+msgstr "Target Scenario"
+
+msgid "i18n_MenuItem_TemplateTypeID"
+msgstr "Template Type"
+
+msgid "i18n_MySQL_Field__template_type|TemplateTypeID"
+msgstr "Template Type ID"
+
+msgid "i18n_MySQL_Field__template_type|TemplateTypeName"
+msgstr "Template Type Name"
+
+msgid "i18n_MySQL_Field__template_type|TemplateStagingTable"
+msgstr "Template Staging Table"
+
+msgid "i18n_MySQL_Field__template_type|TemplateDestinationTable"
+msgstr "Template Destination Table"

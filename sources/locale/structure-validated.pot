@@ -17,4 +17,46 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "i18n_WIP"
-msgstr "WIP (Work In Progress)"
+msgstr ""
+
+msgid "i18n_Back"
+msgstr ""
+
+msgid "i18n_ValuesDetails"
+msgstr ""
+
+msgid "i18n_ValuesList"
+msgstr ""
+
+msgid "i18n_MenuItem_DataLoad"
+msgstr ""
+
+msgid "i18n_MenuItem_Definitions"
+msgstr ""
+
+msgid "i18n_MenuItem_FieldID"
+msgstr ""
+
+msgid "i18n_MenuItem_InformationSourceID"
+msgstr ""
+
+msgid "i18n_MenuItem_MarketID"
+msgstr ""
+
+msgid "i18n_MenuItem_TargetScenarioID"
+msgstr ""
+
+msgid "i18n_MenuItem_TemplateTypeID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__template_type|TemplateTypeID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__template_type|TemplateTypeName"
+msgstr ""
+
+msgid "i18n_MySQL_Field__template_type|TemplateStagingTable"
+msgstr ""
+
+msgid "i18n_MySQL_Field__template_type|TemplateDestinationTable"
+msgstr ""

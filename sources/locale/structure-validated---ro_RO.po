@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: structure-validated\n"
-"POT-Creation-Date: 2017-03-05 17:09+0200\n"
-"PO-Revision-Date: 2017-03-06 01:20+0200\n"
-"Last-Translator: <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2017-03-07 00:12+0200\n"
+"PO-Revision-Date: 2017-03-07 00:13+0200\n"
+"Last-Translator: Daniel Popiniuc <danielpopiniuc@gmail.com>\n"
 "Language-Team: Romanian\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
+"X-Generator: Poedit 1.8.12\n"
 
 msgid "i18n_WIP"
 msgstr "În plin process de construcție"
+
+msgid "i18n_Back"
+msgstr "Înapoi"
+
+msgid "i18n_ValuesDetails"
+msgstr "Detalii înregistrare"
+
+msgid "i18n_ValuesList"
+msgstr "Listă înregistrări"
+
+msgid "i18n_MenuItem_DataLoad"
+msgstr "Încărcare date"
+
+msgid "i18n_MenuItem_Definitions"
+msgstr "Definiții"
+
+msgid "i18n_MenuItem_FieldID"
+msgstr "Câmp (de informații)"
+
+msgid "i18n_MenuItem_InformationSourceID"
+msgstr "Sursa de informație"
+
+msgid "i18n_MenuItem_MarketID"
+msgstr "Piață"
+
+msgid "i18n_MenuItem_TargetScenarioID"
+msgstr "Scenariu țintă"
+
+msgid "i18n_MenuItem_TemplateTypeID"
+msgstr "Tip de șablon"
+
+msgid "i18n_MySQL_Field__template_type|TemplateTypeID"
+msgstr "ID pt. tip de șablon"
+
+msgid "i18n_MySQL_Field__template_type|TemplateTypeName"
+msgstr "Nume tip de șablon"
+
+msgid "i18n_MySQL_Field__template_type|TemplateStagingTable"
+msgstr "Tabela intermediară a șablonului"
+
+msgid "i18n_MySQL_Field__template_type|TemplateDestinationTable"
+msgstr "Tabela de destinație a șablonului"
