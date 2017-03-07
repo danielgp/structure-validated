@@ -318,6 +318,7 @@ class StructureValidated extends SQLqueries
             'method' => 'post',
             'action' => $this->tCmnSuperGlobals->getScriptName()
         ]);
+        $sReturn      = null;
         $sReturn[]    = $this->setFormGenericSingleRecord($tbl, $formFeatures, [
             'action' => 'save',
             'ID'     => $identifier,
@@ -339,7 +340,7 @@ class StructureValidated extends SQLqueries
         }
         if (isset($ftrs['inject_existing_values'])) {
             foreach ($ftrs['inject_existing_values'] as $key => $value) {
-                $this->tCmnSuperGlobals->set('PKvalue', $value);
+                $this->tCmnRequest->request->set($key, $value);
             }
         }
         return $this->setViewModernAdd($tbl, $identifier, $ftrs);
@@ -422,7 +423,7 @@ class StructureValidated extends SQLqueries
         }
 //        if (!is_null($this->appCache['actDtls'][$el]['Rights'])) {
 //            $rights                 = explode(',', $this->appCache['actDtls'][$el]['Rights']);
-        $listingBtns            = ['delete', 'edit', 'schedule', 'list2'];
+        $listingBtns            = ['delete', 'edit'];
         $btns                   = array_intersect($rights, $listingBtns);
         $ftrs['actions']['key'] = 'view';
         foreach ($btns as $value) {

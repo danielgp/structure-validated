@@ -70,6 +70,12 @@ trait Basic
         }
     }
 
+    protected function handlePageReload($actionToTransmit = '', $timeToRefresh = 0)
+    {
+        return '<meta http-equiv="refresh" content="' . $timeToRefresh . '; url='
+            . $this->tCmnSuperGlobals->getScriptName() . $actionToTransmit . '" />';
+    }
+
     protected function localeSV($inputString)
     {
         return $this->tApp->gettext(htmlspecialchars($inputString));
@@ -77,12 +83,11 @@ trait Basic
 
     protected function localeSVextended($inputString, $features = null)
     {
+        $sReturn = '';
         if (isset($features['prefix'])) {
-            $translated = $this->localeSV($features['prefix'] . $inputString);
-            if ($translated === $features['prefix'] . $inputString) {
+            $sReturn = $this->localeSV($features['prefix'] . $inputString);
+            if ($sReturn === $features['prefix'] . $inputString) {
                 $sReturn = $inputString;
-            } else {
-                $sReturn = $translated;
             }
         }
         return $sReturn;
@@ -134,26 +139,23 @@ trait Basic
 
     private function setMenu($menuSettings)
     {
-        $sReturn    = null;
-        $remembered = null;
-        foreach ($menuSettings as $value) {
-            if ($value['Parent'] === true) {
-                $sReturn[] = $this->setMenuParentPrefix($remembered)
-                    . '<li><a href="#"><i class="' . $value['Icon'] . '"></i>'
-                    . $this->localeSVextended($value['ID'], ['prefix' => 'i18n_MenuItem_']) . '</a>';
+        $sRtrn    = null;
+        $remember = null;
+        foreach ($menuSettings as $val) {
+            if ($val['Parent'] === true) {
+                $sRtrn[] = $this->setMenuPattern($this->setMenuParentPrefix($remember), '#', $val['Icon'], $val['ID']);
             } else {
-                if ($value['Parent'] == $remembered['ID']) {
-                    $sReturn[] = '<h2><i class="' . $remembered['Icon'] . '"></i>'
-                        . $this->localeSVextended($remembered['ID'], ['prefix' => 'i18n_MenuItem_']) . '</h2><ul>';
+                if ($val['Parent'] == $remember['ID']) {
+                    $sRtrn[] = '<h2><i class="' . $remember['Icon'] . '"></i>'
+                        . $this->localeSVextended($remember['ID'], ['prefix' => 'i18n_MenuItem_']) . '</h2><ul>';
                 }
-                $sReturn[] = '<li><a href="' . $value['LinkPrefix'] . $value['ID'] . '&amp;T=' . $value['Table']
-                    . '&amp;Q=' . $value['QueryListing'] . '"><i class="' . $value['Icon'] . '"></i>'
-                    . $this->localeSVextended($value['ID'], ['prefix' => 'i18n_MenuItem_']) . '</a></li>';
+                $sRtrn[] = $this->setMenuPattern('', $val['LinkPrefix'] . $val['ID'] . '&amp;T=' . $val['Table']
+                    . '&amp;Q=' . $val['QueryListing'], $val['Icon'], $val['ID']);
             }
-            $remembered = $value;
+            $remember = $val;
         }
         return '<div id="SHmenu"><nav><h2><i class="fa fa-home"></i>&nbsp;</h2>'
-            . implode('', $sReturn) . '</li></ul></nav></div><!-- SHmenu end -->';
+            . implode('', $sRtrn) . '</li></ul></nav></div><!-- SHmenu end -->';
     }
 
     private function setMenuJS()
@@ -178,6 +180,12 @@ trait Basic
                 ' $("#SHmenu").css("visibility", "visible");',
                 '});',
         ]));
+    }
+
+    private function setMenuPattern($sPrefix, $hRef, $valIcon, $valID)
+    {
+        return $sPrefix . '<li><a href="' . $hRef . '">' . '<i class="' . $valIcon . '"></i>'
+            . $this->localeSVextended($valID, ['prefix' => 'i18n_MenuItem_']) . '</a>';
     }
 
     private function setMenuParentPrefix($remembered)
