@@ -45,7 +45,7 @@ class StructureValidated extends SQLqueries
         $targetID       = filter_var($this->tCmnSuperGlobals->get('ID'), FILTER_SANITIZE_STRING);
         $targetTable    = filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING);
         $listingQuery   = filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING);
-        if (in_array($action, ['add', 'edit'])) {
+        if (in_array($action, ['add', 'edit', 'save'])) {
             echo $this->setPerformActions($action, $targetID, $targetTable, $listingQuery);
             return '';
         }
@@ -94,6 +94,144 @@ class StructureValidated extends SQLqueries
         return implode('', $sReturn);
     }
 
+    /**
+     * Cleans an array
+     *
+     * @param array $array2clean
+     * return array
+     */
+    private function setCleanElement($array2clean)
+    {
+        foreach ($array2clean as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $key2 => $value2) {
+                    $value[$key2] = addslashes($value2);
+                }
+            } else {
+                $aReturn[$key] = addslashes($value);
+            }
+        }
+        return $aReturn;
+    }
+
+    /**
+     * Builds the query for insert or update
+     *
+     * @param string $tbl
+     * @param array $fldVls
+     * @param string $type
+     * @param array $colsNQuot
+     * @param $updtWhere
+     * @return unknown_type
+     */
+    protected function setInsertUpdateQuery($tbl, $fldVls, $type, $colsNQuot = ['insertion_datetime'], $updtWhere = '')
+    {
+        global $stringCleaned;
+        $columns2ignore = ['PHPSESSID', 'insertAndUpdate'];
+        foreach ($fldVls as $key => $value) {
+            if ((substr($key, 0, 4) != 'SESS' ) || ($key != 'PHPSESSID' )) {
+                $l[$key] = $value;
+            }
+        }
+        $fldVls         = $l;
+        unset($l);
+        $list_of_values = $this->setCleanElement($fldVls);
+        switch ($type) {
+            case 'insertAndUpdate':
+                $fieldsPrimary  = array_keys($updtWhere);
+            // this has been intentionally left blank
+            case 'insert':
+                $list_of_fields = '';
+                $list_of_values = '';
+                foreach ($fldVls as $key => $value) {
+                    if (!in_array($key, $columns2ignore)) {
+                        if ($list_of_fields != '') {
+                            $list_of_fields .= ',';
+                        }
+                        $list_of_fields .= '`' . $key . '`';
+                        if ($list_of_values != '') {
+                            $list_of_values .= ',';
+                        }
+                        if (is_array($value)) {
+                            $list_of_values .= ($key == 'UserPassword' ? '' : '"');
+                            $list_of_values .= implode(',', $value);
+                            $list_of_values .= ($key == 'UserPassword' ? '' : '"');
+                        } else {
+                            if (!in_array($key, $colsNQuot)) {
+                                $list_of_values .= ($key == 'UserPassword' ? $value : '"'
+                                    . ($stringCleaned ? $value : addslashes($value) ) . '"');
+                            } else {
+                                $list_of_values .= $value;
+                            }
+                        }
+                        if (isset($fieldsPrimary)) {
+                            if (!in_array($key, $fieldsPrimary)) {
+                                $updateString[] = $key . ' = "' . $value . '" ';
+                            }
+                        }
+                    }
+                }
+                $string2return = 'INSERT INTO `' . $tbl . '` (' . $list_of_fields . ') VALUES(' . $list_of_values . ')';
+                if ($type == 'insertAndUpdate') {
+                    $string2return .= ' ON DUPLICATE KEY UPDATE ' . implode(',', $updateString) . ';';
+                } else {
+                    $string2return .= ';';
+                }
+                break;
+            case 'update':
+                $list_of_fields_assigned = '';
+                foreach ($fldVls as $key => $value) {
+                    if (!in_array($key, $columns2ignore)) {
+                        if (!in_array($key, array_keys($updtWhere))) {
+                            if ($list_of_fields_assigned != '') {
+                                $list_of_fields_assigned .= ',';
+                            }
+                            if (!in_array($key, $colsNQuot)) {
+                                if (is_array($value)) {
+                                    $list_of_fields_assigned .= '`' . $key . '` = "'
+                                        . addslashes(implode(',', $value)) . '"';
+                                } else {
+                                    $list_of_fields_assigned .= '`' . $key . '` = "'
+                                        . addslashes($value) . '"';
+                                }
+                            } else {
+                                $list_of_fields_assigned .= $key . ' = '
+                                    . addslashes($value);
+                            }
+                        }
+                    }
+                }
+                $update_where_conditions = '';
+                foreach ($updtWhere as $key => $value) {
+                    if ($update_where_conditions != '') {
+                        $update_where_conditions .= ' AND ';
+                    }
+                    $update_where_conditions .= $key . ' = "' . $value . '"';
+                }
+                $string2return = 'UPDATE `' . $tbl . '` '
+                    . 'SET ' . $list_of_fields_assigned . ' '
+                    . 'WHERE ' . $update_where_conditions . ';';
+                break;
+        }
+        return str_replace('"NULL"', 'NULL', $string2return);
+    }
+
+    /**
+     * Builds up a confirmation dialog and return delection if Yes
+     *
+     * @return string
+     */
+    protected function setJavascriptDeleteWithConfirmationSV()
+    {
+        return $this->setJavascriptContent('function setQuest(a, b) { '
+                . 'c = a.indexOf("_"); switch(a.slice(0, c)) { '
+                . 'case \'delete\': '
+                . 'if (confirm(\'' . $this->lclMsgCmn('i18n_ActionDelete_ConfirmationQuestion') . '\')) { '
+                . 'window.location = document.location.protocol + "//" + '
+                . 'document.location.host + document.location.pathname + '
+                . '"?action=" + a + "&" + b; } break; } }');
+    }
+
     private function setPerformActions($action, $targetID, $targetTable, $listingQuery)
     {
         $sReturn = '';
@@ -102,6 +240,11 @@ class StructureValidated extends SQLqueries
             define('MYSQL_DATABASE', $this->inElmnts['Database']['database']);
         }
         $this->getTableTranslatedFields(MYSQL_DATABASE, $targetTable);
+        $urlParts = [
+            'ID=' . $targetID,
+            'T=' . $targetTable,
+            'Q=' . $listingQuery
+        ];
         switch ($action) {
             case 'add':
                 $contentArray = [
@@ -120,16 +263,29 @@ class StructureValidated extends SQLqueries
                 break;
             case 'delete':
                 $sReturn      = $this->setViewModernDelete($targetTable, $targetID);
-//                if ($this->mySQLconnection->affected_rows > 0) {
-//                    if ($e[1] == 'ScheduleEventId') {
-//                        $this->manageEventEventRemove();
-//                        $e[1] = 'ScheduleId';
-//                    }
-//                    echo $this->handlePageReload('?view=list_' . $e[1], 2);
-//                }
+                if ($this->mySQLconnection->affected_rows > 0) {
+                    echo $this->handlePageReload('?action=list&amp;' . implode('&amp;', $urlParts), 2);
+                }
                 break;
             case 'list':
-                $sReturn      = $this->setStandardDynamicContent($targetID, $targetTable, $listingQuery);
+                $sReturn         = $this->setStandardDynamicContent($targetID, $targetTable, $listingQuery);
+                break;
+            case 'save':
+                $finalJavascript = $this->setJavascriptContent(implode('', [
+                    '$("#SaveFeedback").fadeOut(1900, function() {',
+                    '$(this).remove();',
+                    '});',
+                ]));
+                $sReturn         = $this->setViewModernSave($targetTable, $targetID, null)
+                    . '<div id="SaveFeedback">' . $this->appCache['saveFeedback'] . '</div>'
+                    . $finalJavascript;
+                if ($this->mySQLconnection->affected_rows > 0) {
+                    $sReturn .= $this->handlePageReload('?action=list&amp;' . implode('&amp;', $urlParts), 2);
+                } else {
+                    $sReturn .= '<p style="color:red;background:#fff;">MySQL error: '
+                        . $this->mySQLconnection->errno . ' meaning ' . $this->mySQLconnection->error
+                        . '<br/>The query tried was: ' . $this->appCache['saveQuery'] . '</p>';
+                }
                 break;
         }
         return $sReturn;
@@ -172,7 +328,10 @@ class StructureValidated extends SQLqueries
             $formFeatures['readonly'] = $ftrs['readonly'];
         }
         $sForm = $this->setFormGenericSingleRecord($tbl, $formFeatures, [
-            'view' => (isset($ftrs['forcedView']) ? $ftrs['forcedView'] : 'save_' . $identifier)
+            'action' => (isset($ftrs['forcedView']) ? $ftrs['forcedView'] : 'save'),
+            'ID'     => $identifier,
+            'T'      => filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING),
+            'Q'      => filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING),
         ]);
         if (isset($ftrs['float_left'])) {
             $sReturn[] = $this->setStringIntoTag($sForm, 'div', ['style' => 'float:left;']);
@@ -230,6 +389,38 @@ class StructureValidated extends SQLqueries
         return $sReturn;
     }
 
+    protected function setViewModernLinkAddSV($identifier, $ftrs = null)
+    {
+        $btnText     = '<i class="fa fa-plus-square">&nbsp;</i>' . '&nbsp;' . $this->lclMsgCmn('i18n_AddNewRecord');
+        $tagFeatures = [
+            'href'  => $this->setViewModernLinkAddUrlSV($identifier, $ftrs),
+            'style' => 'margin: 5px 0px 10px 0px; display: inline-block;',
+        ];
+        return $this->setStringIntoTag($btnText, 'a', $tagFeatures);
+    }
+
+    protected function setViewModernLinkAddInjectedArgumentsSV($ftrs = null)
+    {
+        $sArgmnts = '';
+        if (isset($ftrs['injectAddArguments'])) {
+            foreach ($ftrs['injectAddArguments'] as $key => $value) {
+                $sArgmnts .= '&amp;' . $key . '=' . $value;
+            }
+        }
+        return $sArgmnts;
+    }
+
+    protected function setViewModernLinkAddUrlSV($identifier, $ftrs = null)
+    {
+        $sArgmnts  = $this->setViewModernLinkAddInjectedArgumentsSV($ftrs);
+        $this->initializeSprGlbAndSession();
+        $addingUrl = $this->tCmnRequest->server->get('PHP_SELF') . '?action=add&amp;ID=' . $identifier . $sArgmnts;
+        if (!isset($ftrs['NoAjax'])) {
+            $addingUrl = 'javascript:loadAE(\'' . $addingUrl . '\');';
+        }
+        return $addingUrl;
+    }
+
     private function setViewModernListEnhanced($targetID, $targetTable, $listingQuery, $ftrs = null)
     {
         $rights  = ['add', 'delete', 'edit', 'list'];
@@ -238,12 +429,16 @@ class StructureValidated extends SQLqueries
             // no Add Icon will be displayed
         } elseif ($rights != null) {
             if (in_array('add', $rights)) {
-                $sReturn[] = str_replace(['view', '_'], ['action', '&amp;lang='
-                    . $this->tCmnSession->get('lang') . '&amp;T=' . $targetTable
-                    . '&amp;ID='], $this->setViewModernLinkAdd($targetID, null));
+                $sReturn[] = $this->setViewModernLinkAddSV($targetID, [
+                    'injectAddArguments' => [
+                        'land' => $this->tCmnSession->get('lang'),
+                        'T'    => $targetTable,
+                        'Q'    => $listingQuery,
+                    ]
+                ]);
             }
             if (in_array('delete', $rights)) {
-                $sReturn[] = $this->setJavascriptDeleteWithConfirmation();
+                $sReturn[] = $this->setJavascriptDeleteWithConfirmationSV();
             }
         }
         if (isset($ftrs['forcedQuery'])) {
@@ -260,28 +455,36 @@ class StructureValidated extends SQLqueries
             $ftrs['headers_breaked'] = false;
         }
         $ftrs['no_of_decimals'] = 0;
-//        if (isset($ftrs['hidden_columns'])) {
-//            $ftrs['hidden_columns'] = array_merge($ftrs['hidden_columns'], [
-//                $this->appCache['actDtls'][$el]['MenuCommandDescription']
-//            ]);
-//        } else {
-//            $ftrs['hidden_columns'] = [
-//                $this->appCache['actDtls'][$el]['MenuCommandDescription'],
-//                'InsertDateTime',
-//                'ModificationDateTime'
-//            ];
-//        }
+        if (isset($ftrs['hidden_columns'])) {
+            $ftrs['hidden_columns'] = array_merge($ftrs['hidden_columns'], [
+                $this->advCache['tableStructureLocales'][MYSQL_DATABASE . '.' . $targetTable][$targetID]
+            ]);
+        } else {
+            $ftrs['hidden_columns'] = [
+                $this->advCache['tableStructureLocales'][MYSQL_DATABASE . '.' . $targetTable][$targetID]
+            ];
+        }
 //        if (!is_null($this->appCache['actDtls'][$el]['Rights'])) {
 //            $rights                 = explode(',', $this->appCache['actDtls'][$el]['Rights']);
-//            $listingBtns            = ['delete', 'edit', 'schedule', 'list2'];
-//            $btns                   = array_intersect($rights, $listingBtns);
-//            $ftrs['actions']['key'] = 'view';
-//            foreach ($btns as $value) {
-//                $ftrs['actions'][$value] = [
-//                    $value . '_' . $this->appCache['actDtls'][$el]['MenuCommandDescription'],
-//                    [$this->appCache['actDtls'][$el]['MenuCommandDescription']]
-//                ];
-//            }
+        $listingBtns            = ['delete', 'edit', 'schedule', 'list2'];
+        $btns                   = array_intersect($rights, $listingBtns);
+        $ftrs['actions']['key'] = 'view';
+        foreach ($btns as $value) {
+            switch ($value) {
+                case 'delete':
+                    $ftrs['actions'][$value] = [
+                        'value',
+                        $targetID
+                    ];
+                    break;
+                default:
+                    $ftrs['actions'][$value] = [
+                        $value . '' . $this->appCache['actDtls'][$targetID]['ID'],
+                        [$this->appCache['actDtls'][$targetID]['ID']]
+                    ];
+                    break;
+            }
+        }
 //        }
 //        if (!isset($ftrs['IgnoreGrouping'])) {
 //            if (!is_null($this->appCache['actDtls'][$el]['ListingGroupColumn'])) {
@@ -302,10 +505,80 @@ class StructureValidated extends SQLqueries
             $ftrs      = array_merge($ftrs, ['showGroupingCounter' => 1]);
             $sReturn[] = $this->setArrayToTable($dataArray, $ftrs);
         }
-        if (!isset($ftrs['noRecNoInfo'])) {
-            $sReturn[] = $this->getFeedbackMySQLAffectedRecords();
-        }
+//        if (!isset($ftrs['noRecNoInfo'])) {
+//            $sReturn[] = $this->getFeedbackMySQLAffectedRecords();
+//        }
         return implode('', $sReturn);
+    }
+
+    public function setViewModernSave($tbl, $identifier, $ftrs = null)
+    {
+        $array2save          = $_REQUEST;
+        $elementsToEliminate = [
+            'specialNoHeader',
+            'specialNoMenu',
+            'specialNoTitle',
+            'specialNoFooter',
+            'action',
+            'ID',
+            'T',
+            'Q',
+        ];
+        foreach ($array2save as $key => $value) {
+            if (in_array($key, $elementsToEliminate)) {
+                unset($array2save[$key]);
+            }
+        }
+        if (isset($ftrs['insertAndUpdate'])) {
+            $forceInsert = true;
+        } else {
+            $forceInsert = false;
+        }
+        $lString['Title'] = $this->lclMsgCmn('i18n_Action_Confirmation');
+        if ($forceInsert) {
+            $q                               = $this->setInsertUpdateQuery($tbl, $array2save, 'insertAndUpdate', [''], [
+                $identifier => $_REQUEST[$identifier]
+            ]);
+            $this->appCache['saveQuery']     = $q;
+            $this->appCache['saveQueryType'] = 'DynamicForceInsert';
+            $id                              = $this->setMySQLquery2Server($q, 'id')['result'];
+            if ($this->mySQLconnection->affected_rows > 0) {
+                $lString['Tp']         = 'check';
+                $lString['Msg']        = $this->lclMsgCmn('i18n_Action_Successful');
+                $_REQUEST[$identifier] = $this->mySQLconnection->insert_id;
+            } else {
+                $lString['Tp']  = 'error';
+                $lString['Msg'] = $this->lclMsgCmn('i18n_Action_Failed');
+            }
+        } elseif (isset($_REQUEST[$identifier])) {
+            $q                               = $this->setInsertUpdateQuery($tbl, $array2save, 'update', [''], [
+                $identifier => $_REQUEST[$identifier]
+            ]);
+            $this->appCache['saveQuery']     = $q;
+            $this->appCache['saveQueryType'] = 'DynamicUpdate';
+            $id                              = $this->setMySQLquery2Server($q, 'id')['result'];
+            if ($this->mySQLconnection->affected_rows > 0) {
+                $lString['Tp']  = 'check';
+                $lString['Msg'] = $this->lclMsgCmn('i18n_ActionUpdate_Successful');
+            } else {
+                $lString['Tp']  = 'error';
+                $lString['Msg'] = $this->lclMsgCmn('i18n_ActionUpdate_Failed');
+            }
+        } else {
+            $q                               = $this->setInsertUpdateQuery($tbl, $array2save, 'insert');
+            $this->appCache['saveQuery']     = $q;
+            $this->appCache['saveQueryType'] = 'DynamicInsert';
+            $id                              = $this->setMySQLquery2Server($q, 'id')['result'];
+            if ($this->mySQLconnection->affected_rows > 0) {
+                $lString['Tp']         = 'check';
+                $lString['Msg']        = $this->lclMsgCmn('i18n_ActionAdd_Successful');
+                $_REQUEST[$identifier] = $this->mySQLconnection->insert_id;
+            } else {
+                $lString['Tp']  = 'error';
+                $lString['Msg'] = $this->lclMsgCmn('i18n_ActionAdd_Failed');
+            }
+        }
+        $this->appCache['saveFeedback'] = $this->setFeedbackModern($lString['Tp'], $lString['Title'], $lString['Msg']);
     }
 
     /**
