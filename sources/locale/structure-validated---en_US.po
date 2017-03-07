@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: structure-validated\n"
-"POT-Creation-Date: 2017-03-07 00:11+0200\n"
-"PO-Revision-Date: 2017-03-07 00:11+0200\n"
+"POT-Creation-Date: 2017-03-07 22:37+0200\n"
+"PO-Revision-Date: 2017-03-07 23:56+0200\n"
 "Last-Translator: Daniel Popiniuc <danielpopiniuc@gmail.com>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -50,6 +50,30 @@ msgstr "Target Scenario"
 msgid "i18n_MenuItem_TemplateTypeID"
 msgstr "Template Type"
 
+msgid "i18n_MySQL_Field__dimension_information_source|InformationSourceID"
+msgstr "Information Source ID"
+
+msgid "i18n_MySQL_Field__dimension_information_source|InformationSourceName"
+msgstr "Information Source Name"
+
+msgid "i18n_MySQL_Field__dimension_market|MarketID"
+msgstr "Market ID"
+
+msgid "i18n_MySQL_Field__dimension_market|MarketName"
+msgstr "Market Name"
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioID"
+msgstr "Target Scenario ID"
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioName"
+msgstr "Target Scenario Name"
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInStartTimestamp"
+msgstr "Editing Start Timestamp"
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInLockTimestamp"
+msgstr "Deadline Timestamp"
+
 msgid "i18n_MySQL_Field__template_type|TemplateTypeID"
 msgstr "Template Type ID"
 
@@ -61,3 +85,9 @@ msgstr "Template Staging Table"
 
 msgid "i18n_MySQL_Field__template_type|TemplateDestinationTable"
 msgstr "Template Destination Table"
+
+msgid "i18n_MySQL_Field__validation_field|FieldID"
+msgstr "Field ID"
+
+msgid "i18n_MySQL_Field__validation_field|FieldName"
+msgstr "Field Name"

@@ -35,8 +35,10 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
-                '`dis`.`InformationSourceID`',
-                '`dis`.`InformationSourceName`',
+                '`dis`.`InformationSourceID`'
+                . $this->setFieldLocalized('dimension_information_source', 'InformationSourceID'),
+                '`dis`.`InformationSourceName`'
+                . $this->setFieldLocalized('dimension_information_source', 'InformationSourceName'),
             ])
             . 'FROM `dimension_information_source` `dis` '
             . 'GROUP BY `dis`.`InformationSourceName` '
@@ -47,8 +49,8 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
-                '`dm`.`MarketID`',
-                '`dm`.`MarketName`',
+                '`dm`.`MarketID`' . $this->setFieldLocalized('dimension_market', 'MarketID'),
+                '`dm`.`MarketName`' . $this->setFieldLocalized('dimension_market', 'MarketName'),
             ])
             . 'FROM `dimension_market` `dm` '
             . 'GROUP BY `dm`.`MarketName` '
@@ -59,10 +61,14 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
-                '`dts`.`TargetScenarioID`',
-                '`dts`.`TargetScenarioName`',
-                '`dts`.`TargetScenarioInStartTimestamp`',
-                '`dts`.`TargetScenarioInLockTimestamp`',
+                '`dts`.`TargetScenarioID`'
+                . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioID'),
+                '`dts`.`TargetScenarioName`'
+                . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioName'),
+                '`dts`.`TargetScenarioInStartTimestamp`'
+                . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioInStartTimestamp'),
+                '`dts`.`TargetScenarioInLockTimestamp`'
+                . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioInLockTimestamp'),
             ])
             . 'FROM `dimension_target_scenario` `dts` '
             . 'GROUP BY `dts`.`TargetScenarioName` '
@@ -75,6 +81,9 @@ class SQLqueries
             . implode(', ', [
                 '`tt`.`TemplateTypeID`' . $this->setFieldLocalized('template_type', 'TemplateTypeID'),
                 '`tt`.`TemplateTypeName`' . $this->setFieldLocalized('template_type', 'TemplateTypeName'),
+                '`tt`.`TemplateStagingTable`' . $this->setFieldLocalized('template_type', 'TemplateStagingTable'),
+                '`tt`.`TemplateDestinationTable`'
+                . $this->setFieldLocalized('template_type', 'TemplateDestinationTable'),
             ])
             . 'FROM `template_type` `tt` '
             . 'GROUP BY `tt`.`TemplateTypeName` '
@@ -85,8 +94,8 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
-                '`vf`.`FieldID`',
-                '`vf`.`FieldName`',
+                '`vf`.`FieldID`' . $this->setFieldLocalized('validation_field', 'FieldID'),
+                '`vf`.`FieldName`' . $this->setFieldLocalized('validation_field', 'FieldName'),
             ])
             . 'FROM `validation_field` `vf'
             . 'GROUP BY `vf`.`FieldName` '

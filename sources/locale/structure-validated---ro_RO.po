@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: structure-validated\n"
-"POT-Creation-Date: 2017-03-07 00:12+0200\n"
-"PO-Revision-Date: 2017-03-07 00:13+0200\n"
+"POT-Creation-Date: 2017-03-07 22:39+0200\n"
+"PO-Revision-Date: 2017-03-07 23:56+0200\n"
 "Last-Translator: Daniel Popiniuc <danielpopiniuc@gmail.com>\n"
 "Language-Team: Romanian\n"
 "Language: ro\n"
@@ -37,19 +37,45 @@ msgid "i18n_MenuItem_Definitions"
 msgstr "Definiții"
 
 msgid "i18n_MenuItem_FieldID"
-msgstr "Câmp (de informații)"
+msgstr "Câmp (de informație)"
 
 msgid "i18n_MenuItem_InformationSourceID"
 msgstr "Sursa de informație"
 
 msgid "i18n_MenuItem_MarketID"
-msgstr "Piață"
+msgstr "Piață de desfacere"
 
 msgid "i18n_MenuItem_TargetScenarioID"
 msgstr "Scenariu țintă"
 
 msgid "i18n_MenuItem_TemplateTypeID"
 msgstr "Tip de șablon"
+
+msgid "i18n_MySQL_Field__dimension_information_source|InformationSourceID"
+msgstr "ID pt. sursa de informație"
+
+msgid "i18n_MySQL_Field__dimension_information_source|InformationSourceName"
+msgstr "Nume sursa de informație"
+
+msgid "i18n_MySQL_Field__dimension_market|MarketID"
+msgstr "ID pt. piață de desfacere"
+
+msgid "i18n_MySQL_Field__dimension_market|MarketName"
+msgstr "Nume piață de desfacere"
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioID"
+msgstr "ID pt. scenariu țintă"
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioName"
+msgstr "Nume scenariu țintă"
+
+msgid ""
+"i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInStartTimestamp"
+msgstr "Data și ora de început a editării"
+
+msgid ""
+"i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInLockTimestamp"
+msgstr "Data și ora  limită a editării"
 
 msgid "i18n_MySQL_Field__template_type|TemplateTypeID"
 msgstr "ID pt. tip de șablon"
@@ -62,3 +88,9 @@ msgstr "Tabela intermediară a șablonului"
 
 msgid "i18n_MySQL_Field__template_type|TemplateDestinationTable"
 msgstr "Tabela de destinație a șablonului"
+
+msgid "i18n_MySQL_Field__validation_field|FieldID"
+msgstr "ID pt. câmp (de informație)"
+
+msgid "i18n_MySQL_Field__validation_field|FieldName"
+msgstr "Nume câmp (de informație)"

@@ -49,6 +49,30 @@ msgstr ""
 msgid "i18n_MenuItem_TemplateTypeID"
 msgstr ""
 
+msgid "i18n_MySQL_Field__dimension_information_source|InformationSourceID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__dimension_information_source|InformationSourceName"
+msgstr ""
+
+msgid "i18n_MySQL_Field__dimension_market|MarketID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__dimension_market|MarketName"
+msgstr ""
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioName"
+msgstr ""
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInStartTimestamp"
+msgstr ""
+
+msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInLockTimestamp"
+msgstr ""
+
 msgid "i18n_MySQL_Field__template_type|TemplateTypeID"
 msgstr ""
 
@@ -59,4 +83,10 @@ msgid "i18n_MySQL_Field__template_type|TemplateStagingTable"
 msgstr ""
 
 msgid "i18n_MySQL_Field__template_type|TemplateDestinationTable"
+msgstr ""
+
+msgid "i18n_MySQL_Field__validation_field|FieldID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__validation_field|FieldName"
 msgstr ""
