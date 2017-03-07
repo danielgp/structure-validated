@@ -138,7 +138,7 @@ trait Basic
         $remembered = null;
         foreach ($menuSettings as $value) {
             if ($value['Parent'] === true) {
-                $sReturn[] = (!is_null($remembered) ? '</ul></li>' : '')
+                $sReturn[] = $this->setMenuParentPrefix($remembered)
                     . '<li><a href="#"><i class="' . $value['Icon'] . '"></i>'
                     . $this->localeSVextended($value['ID'], ['prefix' => 'i18n_MenuItem_']) . '</a>';
             } else {
@@ -147,14 +147,13 @@ trait Basic
                         . $this->localeSVextended($remembered['ID'], ['prefix' => 'i18n_MenuItem_']) . '</h2><ul>';
                 }
                 $sReturn[] = '<li><a href="' . $value['LinkPrefix'] . $value['ID'] . '&amp;T=' . $value['Table']
-                    . '&amp;Q=' . $value['QueryListing'] . '">'
-                    . '<i class="' . $value['Icon'] . '"></i>'
+                    . '&amp;Q=' . $value['QueryListing'] . '"><i class="' . $value['Icon'] . '"></i>'
                     . $this->localeSVextended($value['ID'], ['prefix' => 'i18n_MenuItem_']) . '</a></li>';
             }
             $remembered = $value;
         }
         return '<div id="SHmenu"><nav><h2><i class="fa fa-home"></i>&nbsp;</h2>'
-            . '<ul>' . implode('', $sReturn) . '</li></ul></nav></div><!-- SHmenu end -->';
+            . implode('', $sReturn) . '</li></ul></nav></div><!-- SHmenu end -->';
     }
 
     private function setMenuJS()
@@ -179,5 +178,25 @@ trait Basic
                 ' $("#SHmenu").css("visibility", "visible");',
                 '});',
         ]));
+    }
+
+    private function setMenuParentPrefix($remembered)
+    {
+        $sReturn = '</ul></li>';
+        if (is_null($remembered)) {
+            $sReturn = '<ul>';
+        }
+        return $sReturn;
+    }
+
+    protected function setViewSanitizeFormFeatures($ftrs, $knownFeatures)
+    {
+        $featuresResulted = [];
+        foreach ($knownFeatures as $value) {
+            if (array_key_exists($value, $ftrs)) {
+                $featuresResulted[$value] = $ftrs[$value];
+            }
+        }
+        return $featuresResulted;
     }
 }

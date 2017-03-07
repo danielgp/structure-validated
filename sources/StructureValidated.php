@@ -313,80 +313,36 @@ class StructureValidated extends SQLqueries
 
     public function setViewModernAdd($tbl, $identifier, $ftrs = null)
     {
-        $formFeatures = [
+        $formFeatures = array_merge($this->setViewSanitizeFormFeatures($ftrs, ['hidden', 'readonly']), [
             'id'     => ('addForm' . date('YmdHis')),
             'method' => 'post',
-            'action' => $_SERVER['PHP_SELF']
-        ];
-        if (@isset($ftrs['forceUpdate'])) {
-            $formFeatures['insertAndUpdate'] = true;
-        }
-        if (isset($ftrs['hidden'])) {
-            $formFeatures['hidden'] = $ftrs['hidden'];
-        }
-        if (isset($ftrs['readonly'])) {
-            $formFeatures['readonly'] = $ftrs['readonly'];
-        }
-        $sForm = $this->setFormGenericSingleRecord($tbl, $formFeatures, [
-            'action' => (isset($ftrs['forcedView']) ? $ftrs['forcedView'] : 'save'),
+            'action' => $this->tCmnSuperGlobals->getScriptName()
+        ]);
+        $sReturn[]    = $this->setFormGenericSingleRecord($tbl, $formFeatures, [
+            'action' => 'save',
             'ID'     => $identifier,
             'T'      => filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING),
             'Q'      => filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING),
         ]);
-        if (isset($ftrs['float_left'])) {
-            $sReturn[] = $this->setStringIntoTag($sForm, 'div', ['style' => 'float:left;']);
-        } else {
-            $sReturn[] = $sForm;
+        if (isset($ftrs['additional_html'])) {
+            $sReturn[] = $ftrs['additional_html'];
         }
-        $allowDisplay = true;
-        if (isset($ftrs['restriction_authenticated'])) {
-            if (!is_null($this->tCmnSession->get('new_username'))) {
-                $this->tCmnSuperGlobals->set('restriction_authenticated', $this->tCmnSession->get('new_username'));
-            } else {
-                $allowDisplay = false;
-            }
-        }
-        if ($allowDisplay) {
-            if (isset($ftrs['additional_html'])) {
-                $sReturn[] = $ftrs['additional_html'];
-            }
-            $finalReturn = implode('', $sReturn);
-        } else {
-            $lString     = [
-                'Title' => $this->lclMsgCmn('i18n_ActionAdd_RestrictionTitle'),
-                'Msg'   => $this->lclMsgCmn('i18n_ActionAdd_RestrictionDetails'),
-            ];
-            $finalReturn = $this->setFeedbackModern('error', $lString['Title'], $lString['Msg']);
-        }
-        return $finalReturn;
+        return implode('', $sReturn);
     }
 
     public function setViewModernEdit($tbl, $identifier, $ftrs = null)
     {
         if (!isset($ftrs['skip_reading_existing_values'])) {
-            $this->getRowDataFromTable($tbl, [$identifier => $_REQUEST[$identifier]]);
+            $this->getRowDataFromTable($tbl, [
+                $identifier => filter_var($this->tCmnSuperGlobals->get('PKvalue'), FILTER_SANITIZE_STRING)
+            ]);
         }
         if (isset($ftrs['inject_existing_values'])) {
             foreach ($ftrs['inject_existing_values'] as $key => $value) {
-                $_REQUEST[$key] = $value;
+                $this->tCmnSuperGlobals->set('PKvalue', $value);
             }
         }
-        $allowDisplay = true;
-        if (isset($ftrs['restriction_author'])) {
-            if (is_null($_REQUEST[$ftrs['restriction_author']])) {
-                $allowDisplay = false;
-            } elseif ($_REQUEST[$ftrs['restriction_author']] != $this->tCmnSession->get('new_username')) {
-                $allowDisplay = false;
-            }
-        }
-        if ($allowDisplay) {
-            $ftrs['forceUpdate'] = true;
-            $sReturn             = $this->setViewModernAdd($tbl, $identifier, $ftrs);
-        } else {
-            echo $this->setFeedbackModern('error', 'SOX', 'Doar originatorul are drept de editare!');
-            $sReturn = false;
-        }
-        return $sReturn;
+        return $this->setViewModernAdd($tbl, $identifier, $ftrs);
     }
 
     protected function setViewModernLinkAddSV($identifier, $ftrs = null)
@@ -414,7 +370,7 @@ class StructureValidated extends SQLqueries
     {
         $sArgmnts  = $this->setViewModernLinkAddInjectedArgumentsSV($ftrs);
         $this->initializeSprGlbAndSession();
-        $addingUrl = $this->tCmnRequest->server->get('PHP_SELF') . '?action=add&amp;ID=' . $identifier . $sArgmnts;
+        $addingUrl = $this->tCmnSuperGlobals->getScriptName() . '?action=add&amp;ID=' . $identifier . $sArgmnts;
         if (!isset($ftrs['NoAjax'])) {
             $addingUrl = 'javascript:loadAE(\'' . $addingUrl . '\');';
         }
@@ -485,20 +441,6 @@ class StructureValidated extends SQLqueries
                     break;
             }
         }
-//        }
-//        if (!isset($ftrs['IgnoreGrouping'])) {
-//            if (!is_null($this->appCache['actDtls'][$el]['ListingGroupColumn'])) {
-//                if (isset($ftrs['ListingGroupType'])) {
-//                    $ftrs['grouping_cell_type'] = $ftrs['OverwriteGroupingType'];
-//                } else {
-//                    $ftrs['grouping_cell_type'] = $this->appCache['actDtls'][$el]['ListingGroupType'];
-//                }
-//                if (isset($ftrs['OverwriteGroupingCell'])) {
-//                    $ftrs['grouping_cell'] = $ftrs['OverwriteGroupingCell'];
-//                } else {
-//                    $ftrs['grouping_cell'] = $this->appCache['actDtls'][$el]['ListingGroupColumn'];
-//                }
-//            }
 //        }
         if (!isset($ftrs['noContentListing'])) {
             $dataArray = $this->setMySQLquery2Server($query, 'full_array_key_numbered')['result'];
