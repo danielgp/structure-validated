@@ -35,6 +35,7 @@ class StructureValidated extends SQLqueries
 {
 
     private $inElmnts = null;
+    protected $appCache;
 
     public function __construct()
     {
@@ -64,12 +65,9 @@ class StructureValidated extends SQLqueries
             'TABLE_SCHEMA' => $dbName,
             'TABLE_NAME'   => $tblName,
         ]);
-        $translated  = true;
         foreach ($tableFields as $value) {
             $lString = 'i18n_MySQL_Field__' . $tblName . '|' . $value['COLUMN_NAME'];
-            if ($this->localeSV($lString) == $lString) {
-                $translated = false;
-            } else {
+            if ($this->localeSV($lString) != $lString) {
                 $aLclFlds[$value['COLUMN_NAME']]                                   = $this->localeSV($lString);
                 $this->advCache['tableStructureLocales'][$dbName . '.' . $tblName] = $aLclFlds;
             }
@@ -102,6 +100,7 @@ class StructureValidated extends SQLqueries
      */
     private function setCleanElement($array2clean)
     {
+        $aReturn = [];
         foreach ($array2clean as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $key2 => $value2) {
@@ -126,15 +125,8 @@ class StructureValidated extends SQLqueries
      */
     protected function setInsertUpdateQuery($tbl, $fldVls, $type, $colsNQuot = ['insertion_datetime'], $updtWhere = '')
     {
-        global $stringCleaned;
+        $string2return  = '';
         $columns2ignore = ['PHPSESSID', 'insertAndUpdate'];
-        foreach ($fldVls as $key => $value) {
-            if ((substr($key, 0, 4) != 'SESS' ) || ($key != 'PHPSESSID' )) {
-                $l[$key] = $value;
-            }
-        }
-        $fldVls         = $l;
-        unset($l);
         $list_of_values = $this->setCleanElement($fldVls);
         switch ($type) {
             case 'insertAndUpdate':
@@ -157,12 +149,7 @@ class StructureValidated extends SQLqueries
                             $list_of_values .= implode(',', $value);
                             $list_of_values .= ($key == 'UserPassword' ? '' : '"');
                         } else {
-                            if (!in_array($key, $colsNQuot)) {
-                                $list_of_values .= ($key == 'UserPassword' ? $value : '"'
-                                    . ($stringCleaned ? $value : addslashes($value) ) . '"');
-                            } else {
-                                $list_of_values .= $value;
-                            }
+                            $list_of_values .= $value;
                         }
                         if (isset($fieldsPrimary)) {
                             if (!in_array($key, $fieldsPrimary)) {
@@ -202,11 +189,13 @@ class StructureValidated extends SQLqueries
                     }
                 }
                 $update_where_conditions = '';
-                foreach ($updtWhere as $key => $value) {
-                    if ($update_where_conditions != '') {
-                        $update_where_conditions .= ' AND ';
+                if (is_array($updtWhere)) {
+                    foreach ($updtWhere as $key => $value) {
+                        if ($update_where_conditions != '') {
+                            $update_where_conditions .= ' AND ';
+                        }
+                        $update_where_conditions .= $key . ' = "' . $value . '"';
                     }
-                    $update_where_conditions .= $key . ' = "' . $value . '"';
                 }
                 $string2return = 'UPDATE `' . $tbl . '` '
                     . 'SET ' . $list_of_fields_assigned . ' '
@@ -254,10 +243,9 @@ class StructureValidated extends SQLqueries
                 $sReturn      = $this->incapsulateContentForPredefinedActions($contentArray, $action);
                 break;
             case 'edit':
-                $ftrs         = $this->handleMenuCommandsReadOnly($targetTable);
                 $contentArray = [
                     $this->lclMsgCmn('i18n_NowYouAreInTheEditingModeOfExistingInformations'),
-                    $this->setViewModernEdit($targetTable, $targetID, $ftrs),
+                    $this->setViewModernEdit($targetTable, $targetID, null),
                 ];
                 $sReturn      = $this->incapsulateContentForPredefinedActions($contentArray, $action);
                 break;
@@ -472,19 +460,18 @@ class StructureValidated extends SQLqueries
                 unset($array2save[$key]);
             }
         }
+        $forceInsert = false;
         if (isset($ftrs['insertAndUpdate'])) {
             $forceInsert = true;
-        } else {
-            $forceInsert = false;
         }
         $lString['Title'] = $this->lclMsgCmn('i18n_Action_Confirmation');
         if ($forceInsert) {
-            $q                               = $this->setInsertUpdateQuery($tbl, $array2save, 'insertAndUpdate', [''], [
+            $qry                             = $this->setInsertUpdateQuery($tbl, $array2save, 'insertAndUpdate', [''], [
                 $identifier => $_REQUEST[$identifier]
             ]);
-            $this->appCache['saveQuery']     = $q;
+            $this->appCache['saveQuery']     = $qry;
             $this->appCache['saveQueryType'] = 'DynamicForceInsert';
-            $id                              = $this->setMySQLquery2Server($q, 'id')['result'];
+            $this->setMySQLquery2Server($qry);
             if ($this->mySQLconnection->affected_rows > 0) {
                 $lString['Tp']         = 'check';
                 $lString['Msg']        = $this->lclMsgCmn('i18n_Action_Successful');
@@ -494,12 +481,12 @@ class StructureValidated extends SQLqueries
                 $lString['Msg'] = $this->lclMsgCmn('i18n_Action_Failed');
             }
         } elseif (isset($_REQUEST[$identifier])) {
-            $q                               = $this->setInsertUpdateQuery($tbl, $array2save, 'update', [''], [
+            $qry                             = $this->setInsertUpdateQuery($tbl, $array2save, 'update', [''], [
                 $identifier => $_REQUEST[$identifier]
             ]);
-            $this->appCache['saveQuery']     = $q;
+            $this->appCache['saveQuery']     = $qry;
             $this->appCache['saveQueryType'] = 'DynamicUpdate';
-            $id                              = $this->setMySQLquery2Server($q, 'id')['result'];
+            $this->setMySQLquery2Server($qry);
             if ($this->mySQLconnection->affected_rows > 0) {
                 $lString['Tp']  = 'check';
                 $lString['Msg'] = $this->lclMsgCmn('i18n_ActionUpdate_Successful');
@@ -508,10 +495,10 @@ class StructureValidated extends SQLqueries
                 $lString['Msg'] = $this->lclMsgCmn('i18n_ActionUpdate_Failed');
             }
         } else {
-            $q                               = $this->setInsertUpdateQuery($tbl, $array2save, 'insert');
-            $this->appCache['saveQuery']     = $q;
+            $qry                             = $this->setInsertUpdateQuery($tbl, $array2save, 'insert');
+            $this->appCache['saveQuery']     = $qry;
             $this->appCache['saveQueryType'] = 'DynamicInsert';
-            $id                              = $this->setMySQLquery2Server($q, 'id')['result'];
+            $this->setMySQLquery2Server($qry);
             if ($this->mySQLconnection->affected_rows > 0) {
                 $lString['Tp']         = 'check';
                 $lString['Msg']        = $this->lclMsgCmn('i18n_ActionAdd_Successful');
