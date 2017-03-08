@@ -35,6 +35,7 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
+                '`dis`.`InformationSourceID`',
                 '`dis`.`InformationSourceID`'
                 . $this->setFieldLocalized('dimension_information_source', 'InformationSourceID'),
                 '`dis`.`InformationSourceName`'
@@ -49,6 +50,7 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
+                '`dm`.`MarketID`',
                 '`dm`.`MarketID`' . $this->setFieldLocalized('dimension_market', 'MarketID'),
                 '`dm`.`MarketName`' . $this->setFieldLocalized('dimension_market', 'MarketName'),
             ])
@@ -61,6 +63,7 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
+                '`dts`.`TargetScenarioID`',
                 '`dts`.`TargetScenarioID`'
                 . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioID'),
                 '`dts`.`TargetScenarioName`'
@@ -79,6 +82,7 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
+                '`tt`.`TemplateTypeID`',
                 '`tt`.`TemplateTypeID`' . $this->setFieldLocalized('template_type', 'TemplateTypeID'),
                 '`tt`.`TemplateTypeName`' . $this->setFieldLocalized('template_type', 'TemplateTypeName'),
                 '`tt`.`TemplateStagingTable`' . $this->setFieldLocalized('template_type', 'TemplateStagingTable'),
@@ -94,6 +98,7 @@ class SQLqueries
     {
         return 'SELECT '
             . implode(', ', [
+                '`vf`.`FieldID`',
                 '`vf`.`FieldID`' . $this->setFieldLocalized('validation_field', 'FieldID'),
                 '`vf`.`FieldName`' . $this->setFieldLocalized('validation_field', 'FieldName'),
             ])

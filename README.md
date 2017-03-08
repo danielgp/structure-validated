@@ -19,10 +19,10 @@ Code quality analysis
 Feature Name | Status Date | Status
 ------------ | ----------- | ------
 Mass-upload values to dimension tables | March 6th, 2017 | Planned
-Display existing values from dimension tables | March 6th, 2017 | WIP
-Manually add 1 value to dimension/x-reference table of choice | March 6th, 2017 | Planned
-Manually modify 1 value from dimension/x-reference table of choice | March 6th, 2017 | Planned
-Manually delete unused values from dimension/x-reference table of choice | March 6th, 2017 | Planned
+Display existing values from dimension tables | March 6th, 2017 | :ballot_box_with_check:
+Manually add 1 value to dimension/x-reference table of choice | March 9th, 2017 | :ballot_box_with_check:
+Manually modify 1 value from dimension/x-reference table of choice | March 9th, 2017 | :ballot_box_with_check:
+Manually delete unused values from dimension/x-reference table of choice | March 9th, 2017 | :ballot_box_with_check:
 Load values into target table containing a series of dimensions | March 6th, 2017 | Planned
 Keep track of any values loading so it can be corrected/reloaded/removed later on | March 6th, 2017 | Planned
 Ability to add/modify/delete validations from interface for values loading | March 6th, 2017 | Planned

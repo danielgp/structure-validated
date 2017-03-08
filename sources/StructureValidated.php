@@ -39,14 +39,39 @@ class StructureValidated extends SQLqueries
 
     public function __construct()
     {
-        $this->inElmnts = $this->readTypeFromJsonFileStructureValidated('config', 'interfaceElements');
+        $this->inElmnts          = $this->readTypeFromJsonFileStructureValidated('config', 'interfaceElements');
         $this->initializeSprGlbAndSession();
         $this->handleLocalizationStructureValidated($this->inElmnts['Application']);
-        $action         = filter_var($this->tCmnSuperGlobals->get('action'), FILTER_SANITIZE_STRING);
-        $targetID       = filter_var($this->tCmnSuperGlobals->get('ID'), FILTER_SANITIZE_STRING);
-        $targetTable    = filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING);
-        $listingQuery   = filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING);
-        if (in_array($action, ['add', 'edit', 'save'])) {
+        $action                  = filter_var($this->tCmnSuperGlobals->get('action'), FILTER_SANITIZE_STRING);
+        $nonSpecialDetermination = true;
+        if ($action == 'save') {
+            $nonSpecialDetermination = $this->tCmnSuperGlobals->request;
+            if ($this->tCmnSuperGlobals->get('operation') == 'add') {
+                $nonSpecialDetermination = true;
+            }
+        } elseif (in_array($action, ['delete', 'edit'])) {
+            $nonSpecialDetermination = $this->tCmnSuperGlobals->query;
+        }
+        if ($nonSpecialDetermination === true) {
+            $targetID     = filter_var($this->tCmnSuperGlobals->get('ID'), FILTER_SANITIZE_STRING);
+            $targetTable  = filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING);
+            $listingQuery = filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING);
+        } else {
+            $targetID         = '';
+            $targetTable      = '';
+            $tableByID        = array_column($this->inElmnts['Menu'], 'Table', 'ID');
+            $listingQueryByID = array_column($this->inElmnts['Menu'], 'QueryListing', 'ID');
+            $counter          = 0;
+            foreach ($nonSpecialDetermination as $key => $value) {
+                if (!in_array($key, ['action', 'specialHook']) && ($counter == 0)) {
+                    $targetID     = $key;
+                    $targetTable  = $tableByID[$key];
+                    $listingQuery = $listingQueryByID[$key];
+                    $counter++;
+                }
+            }
+        }
+        if (in_array($action, ['add', 'edit'])) {
             echo $this->setPerformActions($action, $targetID, $targetTable, $listingQuery);
             return '';
         }
@@ -123,83 +148,34 @@ class StructureValidated extends SQLqueries
      * @param $updtWhere
      * @return unknown_type
      */
-    protected function setInsertUpdateQuery($tbl, $fldVls, $type, $colsNQuot = ['insertion_datetime'], $updtWhere = '')
+    protected function setInsertUpdateQuery($tbl, $fldVls, $type)
     {
-        $string2return  = '';
-        $columns2ignore = ['PHPSESSID', 'insertAndUpdate'];
-        $list_of_values = $this->setCleanElement($fldVls);
+        $string2return = '';
         switch ($type) {
-            case 'insertAndUpdate':
-                $fieldsPrimary  = array_keys($updtWhere);
-            // this has been intentionally left blank
             case 'insert':
-                $list_of_fields = '';
-                $list_of_values = '';
-                foreach ($fldVls as $key => $value) {
-                    if (!in_array($key, $columns2ignore)) {
-                        if ($list_of_fields != '') {
-                            $list_of_fields .= ',';
-                        }
-                        $list_of_fields .= '`' . $key . '`';
-                        if ($list_of_values != '') {
-                            $list_of_values .= ',';
-                        }
-                        if (is_array($value)) {
-                            $list_of_values .= ($key == 'UserPassword' ? '' : '"');
-                            $list_of_values .= implode(',', $value);
-                            $list_of_values .= ($key == 'UserPassword' ? '' : '"');
-                        } else {
-                            $list_of_values .= $value;
-                        }
-                        if (isset($fieldsPrimary)) {
-                            if (!in_array($key, $fieldsPrimary)) {
-                                $updateString[] = $key . ' = "' . $value . '" ';
-                            }
-                        }
-                    }
-                }
-                $string2return = 'INSERT INTO `' . $tbl . '` (' . $list_of_fields . ') VALUES(' . $list_of_values . ')';
-                if ($type == 'insertAndUpdate') {
-                    $string2return .= ' ON DUPLICATE KEY UPDATE ' . implode(',', $updateString) . ';';
-                } else {
-                    $string2return .= ';';
-                }
+                $string2return = 'INSERT INTO `' . $tbl . '` (`' . implode('`', array_keys($fldVls))
+                    . '`) VALUES("' . implode('"', array_values($fldVls)) . '");';
                 break;
             case 'update':
-                $list_of_fields_assigned = '';
-                foreach ($fldVls as $key => $value) {
-                    if (!in_array($key, $columns2ignore)) {
-                        if (!in_array($key, array_keys($updtWhere))) {
-                            if ($list_of_fields_assigned != '') {
-                                $list_of_fields_assigned .= ',';
-                            }
-                            if (!in_array($key, $colsNQuot)) {
-                                if (is_array($value)) {
-                                    $list_of_fields_assigned .= '`' . $key . '` = "'
-                                        . addslashes(implode(',', $value)) . '"';
-                                } else {
-                                    $list_of_fields_assigned .= '`' . $key . '` = "'
-                                        . addslashes($value) . '"';
-                                }
-                            } else {
-                                $list_of_fields_assigned .= $key . ' = '
-                                    . addslashes($value);
-                            }
-                        }
+                $whereSQL      = [];
+                $whereCols     = [];
+                $primaryIndex  = $this->getMySQLlistIndexes([
+                    'TABLE_SCHEMA'    => MYSQL_DATABASE,
+                    'TABLE_NAME'      => $tbl,
+                    'CONSTRAINT_NAME' => 'PRIMARY'
+                ]);
+                foreach ($primaryIndex as $val) {
+                    $whereSQL[]  = '`' . $val['COLUMN_NAME'] . '` = "' . addslashes($fldVls[$val['COLUMN_NAME']]) . '"';
+                    $whereCols[] = $val['COLUMN_NAME'];
+                }
+                $updateFV = [];
+                foreach ($fldVls as $key => $val) {
+                    if (!in_array($key, $whereCols)) {
+                        $updateFV[] = '`' . $key . '` = "' . addslashes($val) . '"';
                     }
                 }
-                $update_where_conditions = '';
-                if (is_array($updtWhere)) {
-                    foreach ($updtWhere as $key => $value) {
-                        if ($update_where_conditions != '') {
-                            $update_where_conditions .= ' AND ';
-                        }
-                        $update_where_conditions .= $key . ' = "' . $value . '"';
-                    }
-                }
-                $string2return = 'UPDATE `' . $tbl . '` '
-                    . 'SET ' . $list_of_fields_assigned . ' '
-                    . 'WHERE ' . $update_where_conditions . ';';
+                $string2return = 'UPDATE `' . $tbl . '` SET ' . implode(', ', $updateFV)
+                    . ' WHERE ' . implode(' AND ', $whereSQL) . ';';
                 break;
         }
         return str_replace('"NULL"', 'NULL', $string2return);
@@ -213,12 +189,11 @@ class StructureValidated extends SQLqueries
     protected function setJavascriptDeleteWithConfirmationSV()
     {
         return $this->setJavascriptContent('function setQuest(a, b) { '
-                . 'c = a.indexOf("_"); switch(a.slice(0, c)) { '
-                . 'case \'delete\': '
-                . 'if (confirm(\'' . $this->lclMsgCmn('i18n_ActionDelete_ConfirmationQuestion') . '\')) { '
+                . 'if (a === "delete") { '
+                . 'if (confirm(\'' . $this->lclMsgCmn('i18n_ActionDelete_ConfirmationQuestion') . ' \', b)) { '
                 . 'window.location = document.location.protocol + "//" + '
                 . 'document.location.host + document.location.pathname + '
-                . '"?action=" + a + "&" + b; } break; } }');
+                . '"?action=" + a + "&" + b; } } }');
     }
 
     private function setPerformActions($action, $targetID, $targetTable, $listingQuery)
@@ -238,20 +213,20 @@ class StructureValidated extends SQLqueries
             case 'add':
                 $contentArray = [
                     $this->lclMsgCmn('i18n_NowYouAreInTheNewInformationAddingMode'),
-                    $this->setViewModernAdd($targetTable, $targetID),
+                    $this->setViewModernAdd($targetTable, $targetID, $action),
                 ];
                 $sReturn      = $this->incapsulateContentForPredefinedActions($contentArray, $action);
                 break;
             case 'edit':
                 $contentArray = [
                     $this->lclMsgCmn('i18n_NowYouAreInTheEditingModeOfExistingInformations'),
-                    $this->setViewModernEdit($targetTable, $targetID, null),
+                    $this->setViewModernEdit($targetTable, $targetID, $action, null),
                 ];
                 $sReturn      = $this->incapsulateContentForPredefinedActions($contentArray, $action);
                 break;
             case 'delete':
                 $sReturn      = $this->setViewModernDelete($targetTable, $targetID);
-                if ($this->mySQLconnection->affected_rows > 0) {
+                if ($this->mySQLconnection->affected_rows >= 0) {
                     echo $this->handlePageReload('?action=list&amp;' . implode('&amp;', $urlParts), 2);
                 }
                 break;
@@ -264,7 +239,7 @@ class StructureValidated extends SQLqueries
                     '$(this).remove();',
                     '});',
                 ]));
-                $sReturn         = $this->setViewModernSave($targetTable, $targetID, null)
+                $sReturn         = $this->setViewModernSave($targetTable, $targetID)
                     . '<div id="SaveFeedback">' . $this->appCache['saveFeedback'] . '</div>'
                     . $finalJavascript;
                 if ($this->mySQLconnection->affected_rows > 0) {
@@ -299,7 +274,7 @@ class StructureValidated extends SQLqueries
             . '<div class="tabber" id="' . $tabName . '">' . implode('', $sReturn) . '</div><!--from main tabber-->';
     }
 
-    public function setViewModernAdd($tbl, $identifier, $ftrs = null)
+    public function setViewModernAdd($tbl, $identifier, $action = 'insert', $ftrs = null)
     {
         $formFeatures = array_merge($this->setViewSanitizeFormFeatures($ftrs, ['hidden', 'readonly']), [
             'id'     => ('addForm' . date('YmdHis')),
@@ -308,10 +283,11 @@ class StructureValidated extends SQLqueries
         ]);
         $sReturn      = null;
         $sReturn[]    = $this->setFormGenericSingleRecord($tbl, $formFeatures, [
-            'action' => 'save',
-            'ID'     => $identifier,
-            'T'      => filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING),
-            'Q'      => filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING),
+            'action'    => 'save',
+            'operation' => $action,
+            'ID'        => $identifier,
+            'T'         => filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING),
+            'Q'         => filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING),
         ]);
         if (isset($ftrs['additional_html'])) {
             $sReturn[] = $ftrs['additional_html'];
@@ -319,11 +295,11 @@ class StructureValidated extends SQLqueries
         return implode('', $sReturn);
     }
 
-    public function setViewModernEdit($tbl, $identifier, $ftrs = null)
+    public function setViewModernEdit($tbl, $identifier, $action = 'edit', $ftrs = null)
     {
         if (!isset($ftrs['skip_reading_existing_values'])) {
             $this->getRowDataFromTable($tbl, [
-                $identifier => filter_var($this->tCmnSuperGlobals->get('PKvalue'), FILTER_SANITIZE_STRING)
+                $identifier => filter_var($this->tCmnSuperGlobals->get($identifier), FILTER_SANITIZE_STRING)
             ]);
         }
         if (isset($ftrs['inject_existing_values'])) {
@@ -331,7 +307,7 @@ class StructureValidated extends SQLqueries
                 $this->tCmnRequest->request->set($key, $value);
             }
         }
-        return $this->setViewModernAdd($tbl, $identifier, $ftrs);
+        return $this->setViewModernAdd($tbl, $identifier, $action, $ftrs);
     }
 
     protected function setViewModernLinkAddSV($identifier, $ftrs = null)
@@ -340,6 +316,7 @@ class StructureValidated extends SQLqueries
         $tagFeatures = [
             'href'  => $this->setViewModernLinkAddUrlSV($identifier, $ftrs),
             'style' => 'margin: 5px 0px 10px 0px; display: inline-block;',
+            'id'    => 'add_' . $identifier
         ];
         return $this->setStringIntoTag($btnText, 'a', $tagFeatures);
     }
@@ -376,7 +353,7 @@ class StructureValidated extends SQLqueries
             if (in_array('add', $rights)) {
                 $sReturn[] = $this->setViewModernLinkAddSV($targetID, [
                     'injectAddArguments' => [
-                        'land' => $this->tCmnSession->get('lang'),
+                        'lang' => $this->tCmnSession->get('lang'),
                         'T'    => $targetTable,
                         'Q'    => $listingQuery,
                     ]
@@ -400,90 +377,74 @@ class StructureValidated extends SQLqueries
             $ftrs['headers_breaked'] = false;
         }
         $ftrs['no_of_decimals'] = 0;
-        if (isset($ftrs['hidden_columns'])) {
-            $ftrs['hidden_columns'] = array_merge($ftrs['hidden_columns'], [
-                $this->advCache['tableStructureLocales'][MYSQL_DATABASE . '.' . $targetTable][$targetID]
-            ]);
-        } else {
-            $ftrs['hidden_columns'] = [
-                $this->advCache['tableStructureLocales'][MYSQL_DATABASE . '.' . $targetTable][$targetID]
-            ];
-        }
-//        if (!is_null($this->appCache['actDtls'][$el]['Rights'])) {
-//            $rights                 = explode(',', $this->appCache['actDtls'][$el]['Rights']);
+        $ftrs['hidden_columns'] = [
+            $this->advCache['tableStructureLocales'][MYSQL_DATABASE . '.' . $targetTable][$targetID],
+            $targetID
+        ];
         $listingBtns            = ['delete', 'edit'];
         $btns                   = array_intersect($rights, $listingBtns);
-        $ftrs['actions']['key'] = 'view';
+        $ftrs['actions']['key'] = 'action';
         foreach ($btns as $value) {
-            switch ($value) {
-                case 'delete':
-                    $ftrs['actions'][$value] = [
-                        'value',
-                        $targetID
-                    ];
-                    break;
-                default:
-                    $ftrs['actions'][$value] = [
-                        $value . '' . $this->appCache['actDtls'][$targetID]['ID'],
-                        [$this->appCache['actDtls'][$targetID]['ID']]
-                    ];
-                    break;
-            }
+            $ftrs['actions'][$value] = [
+                $value,
+                [
+                    $targetID,
+                ]
+            ];
         }
-//        }
         if (!isset($ftrs['noContentListing'])) {
             $dataArray = $this->setMySQLquery2Server($query, 'full_array_key_numbered')['result'];
             $ftrs      = array_merge($ftrs, ['showGroupingCounter' => 1]);
             $sReturn[] = $this->setArrayToTable($dataArray, $ftrs);
         }
-//        if (!isset($ftrs['noRecNoInfo'])) {
-//            $sReturn[] = $this->getFeedbackMySQLAffectedRecords();
-//        }
+        if (!isset($ftrs['noRecNoInfo'])) {
+            $sReturn[] = $this->getFeedbackMySQLAffectedRecords();
+        }
         return implode('', $sReturn);
     }
 
     public function setViewModernSave($tbl, $identifier, $ftrs = null)
     {
-        $array2save          = $_REQUEST;
+        $array2save          = [];
         $elementsToEliminate = [
             'specialNoHeader',
             'specialNoMenu',
             'specialNoTitle',
             'specialNoFooter',
             'action',
+            'operation',
             'ID',
             'T',
             'Q',
         ];
-        foreach ($array2save as $key => $value) {
-            if (in_array($key, $elementsToEliminate)) {
-                unset($array2save[$key]);
+        foreach ($this->tCmnSuperGlobals->request as $key => $value) {
+            if (!in_array($key, $elementsToEliminate)) {
+                $array2save[$key] = $value;
             }
         }
         $forceInsert = false;
         if (isset($ftrs['insertAndUpdate'])) {
             $forceInsert = true;
         }
+        if ($tbl == '') {
+            $tbl = $this->tCmnSuperGlobals->get('T');
+        }
         $lString['Title'] = $this->lclMsgCmn('i18n_Action_Confirmation');
-        if ($forceInsert) {
-            $qry                             = $this->setInsertUpdateQuery($tbl, $array2save, 'insertAndUpdate', [''], [
-                $identifier => $_REQUEST[$identifier]
-            ]);
+        if (!is_null($this->tCmnSuperGlobals->get('operation')) && $this->tCmnSuperGlobals->get('operation') == 'add') {
+            $qry                             = $this->setInsertUpdateQuery($tbl, $array2save, 'insert');
             $this->appCache['saveQuery']     = $qry;
-            $this->appCache['saveQueryType'] = 'DynamicForceInsert';
+            $this->appCache['saveQueryType'] = 'DynamicInsert';
             $this->setMySQLquery2Server($qry);
             if ($this->mySQLconnection->affected_rows > 0) {
-                $lString['Tp']         = 'check';
-                $lString['Msg']        = $this->lclMsgCmn('i18n_Action_Successful');
-                $_REQUEST[$identifier] = $this->mySQLconnection->insert_id;
+                $lString['Tp']  = 'check';
+                $lString['Msg'] = $this->lclMsgCmn('i18n_ActionAdd_Successful');
+                $this->tCmnRequest->request->set($identifier, $this->mySQLconnection->insert_id);
             } else {
                 $lString['Tp']  = 'error';
-                $lString['Msg'] = $this->lclMsgCmn('i18n_Action_Failed');
+                $lString['Msg'] = $this->lclMsgCmn('i18n_ActionAdd_Failed');
             }
-        } elseif (isset($_REQUEST[$identifier])) {
-            $qry                             = $this->setInsertUpdateQuery($tbl, $array2save, 'update', [''], [
-                $identifier => $_REQUEST[$identifier]
-            ]);
+        } else {
+            $qry                             = $this->setInsertUpdateQuery($tbl, $array2save, 'update');
             $this->appCache['saveQuery']     = $qry;
             $this->appCache['saveQueryType'] = 'DynamicUpdate';
             $this->setMySQLquery2Server($qry);
@@ -493,19 +454,6 @@ class StructureValidated extends SQLqueries
             } else {
                 $lString['Tp']  = 'error';
                 $lString['Msg'] = $this->lclMsgCmn('i18n_ActionUpdate_Failed');
-            }
-        } else {
-            $qry                             = $this->setInsertUpdateQuery($tbl, $array2save, 'insert');
-            $this->appCache['saveQuery']     = $qry;
-            $this->appCache['saveQueryType'] = 'DynamicInsert';
-            $this->setMySQLquery2Server($qry);
-            if ($this->mySQLconnection->affected_rows > 0) {
-                $lString['Tp']         = 'check';
-                $lString['Msg']        = $this->lclMsgCmn('i18n_ActionAdd_Successful');
-                $_REQUEST[$identifier] = $this->mySQLconnection->insert_id;
-            } else {
-                $lString['Tp']  = 'error';
-                $lString['Msg'] = $this->lclMsgCmn('i18n_ActionAdd_Failed');
             }
         }
         $this->appCache['saveFeedback'] = $this->setFeedbackModern($lString['Tp'], $lString['Title'], $lString['Msg']);

@@ -222,16 +222,16 @@
         },
         {
             "name": "danielgp/common-lib",
-            "version": "3.0.2",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/danielgp/common-lib.git",
-                "reference": "11029f980c69d93062a9a216f91947656b506e00"
+                "reference": "6e8019af6e73328092242cea1e8597f55ccc0a1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danielgp/common-lib/zipball/11029f980c69d93062a9a216f91947656b506e00",
-                "reference": "11029f980c69d93062a9a216f91947656b506e00",
+                "url": "https://api.github.com/repos/danielgp/common-lib/zipball/6e8019af6e73328092242cea1e8597f55ccc0a1d",
+                "reference": "6e8019af6e73328092242cea1e8597f55ccc0a1d",
                 "shasum": ""
             },
             "require": {
@@ -286,7 +286,7 @@
                 }
             ],
             "description": "Common functions to be used where needed",
-            "time": "2016-07-28T20:25:04+00:00"
+            "time": "2017-03-08T23:44:34+00:00"
         },
         {
             "name": "danielgp/common-styles",
