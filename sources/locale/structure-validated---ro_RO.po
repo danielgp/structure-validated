@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: structure-validated\n"
-"POT-Creation-Date: 2017-03-07 22:39+0200\n"
-"PO-Revision-Date: 2017-03-07 23:56+0200\n"
+"POT-Creation-Date: 2017-03-12 22:41+0200\n"
+"PO-Revision-Date: 2017-03-13 00:47+0200\n"
 "Last-Translator: Daniel Popiniuc <danielpopiniuc@gmail.com>\n"
 "Language-Team: Romanian\n"
 "Language: ro\n"
@@ -34,16 +34,28 @@ msgid "i18n_MenuItem_DataLoad"
 msgstr "Încărcare date"
 
 msgid "i18n_MenuItem_Definitions"
-msgstr "Definiții"
+msgstr "Definiții conținut"
 
 msgid "i18n_MenuItem_FieldID"
 msgstr "Câmp (de informație)"
 
 msgid "i18n_MenuItem_InformationSourceID"
-msgstr "Sursa de informație"
+msgstr "Sursa informație"
+
+msgid "i18n_MenuItem_InternalDefinitions"
+msgstr "Definiții interne"
 
 msgid "i18n_MenuItem_MarketID"
 msgstr "Piață de desfacere"
+
+msgid "i18n_MenuItem_TableDimensionID"
+msgstr "Tabele dimensiuni"
+
+msgid "i18n_MenuItem_TableMeasureStagingID"
+msgstr "Tabele intermediare valori"
+
+msgid "i18n_MenuItem_TableMeasureReportingID"
+msgstr "Tabele raportare valori"
 
 msgid "i18n_MenuItem_TargetScenarioID"
 msgstr "Scenariu țintă"
@@ -52,16 +64,16 @@ msgid "i18n_MenuItem_TemplateTypeID"
 msgstr "Tip de șablon"
 
 msgid "i18n_MySQL_Field__dimension_information_source|InformationSourceID"
-msgstr "ID pt. sursa de informație"
+msgstr "ID pt. sursa informație"
 
 msgid "i18n_MySQL_Field__dimension_information_source|InformationSourceName"
-msgstr "Nume sursa de informație"
+msgstr "Nume sursa informație"
 
 msgid "i18n_MySQL_Field__dimension_market|MarketID"
-msgstr "ID pt. piață de desfacere"
+msgstr "ID pt. piață desfacere"
 
 msgid "i18n_MySQL_Field__dimension_market|MarketName"
-msgstr "Nume piață de desfacere"
+msgstr "Nume piață desfacere"
 
 msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioID"
 msgstr "ID pt. scenariu țintă"
@@ -77,17 +89,35 @@ msgid ""
 "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInLockTimestamp"
 msgstr "Data și ora  limită a editării"
 
+msgid "i18n_MySQL_Field__table_dimension|TableDimensionID"
+msgstr "ID pt. tabela dimensiune"
+
+msgid "i18n_MySQL_Field__table_dimension|TableNameDimension"
+msgstr "Nume tabela dimensiune"
+
+msgid "i18n_MySQL_Field__table_measure_staging|TableMeasureStagingID"
+msgstr "ID pt. tabela intermediară valori"
+
+msgid "i18n_MySQL_Field__table_measure_staging|TableNameMeasureStaging"
+msgstr "Nume tabelă intermediară valori"
+
+msgid "i18n_MySQL_Field__table_measure_reporting|TableMeasureReportingID"
+msgstr "ID pt. tabela raportare valori"
+
+msgid "i18n_MySQL_Field__table_measure_reporting|TableNameMeasureReporting"
+msgstr "Nume tabelă raportare valori"
+
 msgid "i18n_MySQL_Field__template_type|TemplateTypeID"
-msgstr "ID pt. tip de șablon"
+msgstr "ID pt. tip șablon"
 
 msgid "i18n_MySQL_Field__template_type|TemplateTypeName"
-msgstr "Nume tip de șablon"
+msgstr "Nume tip șablon"
 
-msgid "i18n_MySQL_Field__template_type|TemplateStagingTable"
-msgstr "Tabela intermediară a șablonului"
+msgid "i18n_MySQL_Field__template_type|TableMeasureStagingID"
+msgstr "Tabela intermediară șablon"
 
-msgid "i18n_MySQL_Field__template_type|TemplateDestinationTable"
-msgstr "Tabela de destinație a șablonului"
+msgid "i18n_MySQL_Field__template_type|TableMeasureReportingID"
+msgstr "Tabela raportare șablon"
 
 msgid "i18n_MySQL_Field__validation_field|FieldID"
 msgstr "ID pt. câmp (de informație)"

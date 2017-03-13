@@ -40,7 +40,19 @@ msgstr ""
 msgid "i18n_MenuItem_InformationSourceID"
 msgstr ""
 
+msgid "i18n_MenuItem_InternalDefinitions"
+msgstr ""
+
 msgid "i18n_MenuItem_MarketID"
+msgstr ""
+
+msgid "i18n_MenuItem_TableDimensionID"
+msgstr ""
+
+msgid "i18n_MenuItem_TableMeasureStagingID"
+msgstr ""
+
+msgid "i18n_MenuItem_TableMeasureReportingID"
 msgstr ""
 
 msgid "i18n_MenuItem_TargetScenarioID"
@@ -73,16 +85,34 @@ msgstr ""
 msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInLockTimestamp"
 msgstr ""
 
+msgid "i18n_MySQL_Field__table_dimension|TableDimensionID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__table_dimension|TableNameDimension"
+msgstr ""
+
+msgid "i18n_MySQL_Field__table_measure_staging|TableMeasureStagingID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__table_measure_staging|TableNameMeasureStaging"
+msgstr ""
+
+msgid "i18n_MySQL_Field__table_measure_reporting|TableMeasureReportingID"
+msgstr ""
+
+msgid "i18n_MySQL_Field__table_measure_reporting|TableNameMeasureReporting"
+msgstr ""
+
 msgid "i18n_MySQL_Field__template_type|TemplateTypeID"
 msgstr ""
 
 msgid "i18n_MySQL_Field__template_type|TemplateTypeName"
 msgstr ""
 
-msgid "i18n_MySQL_Field__template_type|TemplateStagingTable"
+msgid "i18n_MySQL_Field__template_type|TableMeasureStagingID"
 msgstr ""
 
-msgid "i18n_MySQL_Field__template_type|TemplateDestinationTable"
+msgid "i18n_MySQL_Field__template_type|TableMeasureReportingID"
 msgstr ""
 
 msgid "i18n_MySQL_Field__validation_field|FieldID"

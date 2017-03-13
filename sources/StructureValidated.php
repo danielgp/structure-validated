@@ -39,47 +39,42 @@ class StructureValidated extends SQLqueries
 
     public function __construct()
     {
-        $this->inElmnts          = $this->readTypeFromJsonFileStructureValidated('config', 'interfaceElements');
+        $this->inElmnts = $this->readTypeFromJsonFileStructureValidated('config', 'interfaceElements');
         $this->initializeSprGlbAndSession();
         $this->handleLocalizationStructureValidated($this->inElmnts['Application']);
-        $action                  = filter_var($this->tCmnSuperGlobals->get('action'), FILTER_SANITIZE_STRING);
-        $nonSpecialDetermination = true;
+        $action         = filter_var($this->tCmnSuperGlobals->get('action'), FILTER_SANITIZE_STRING);
         if ($action == 'save') {
             $nonSpecialDetermination = $this->tCmnSuperGlobals->request;
-            if ($this->tCmnSuperGlobals->get('operation') == 'add') {
-                $nonSpecialDetermination = true;
-            }
-        } elseif (in_array($action, ['delete', 'edit'])) {
+        } elseif (in_array($action, ['add', 'delete', 'edit', 'list'])) {
             $nonSpecialDetermination = $this->tCmnSuperGlobals->query;
         }
-        if ($nonSpecialDetermination === true) {
-            $targetID     = filter_var($this->tCmnSuperGlobals->get('ID'), FILTER_SANITIZE_STRING);
-            $targetTable  = filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING);
-            $listingQuery = filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING);
-        } else {
-            $targetID         = '';
-            $targetTable      = '';
-            $tableByID        = array_column($this->inElmnts['Menu'], 'Table', 'ID');
-            $listingQueryByID = array_column($this->inElmnts['Menu'], 'QueryListing', 'ID');
-            $counter          = 0;
-            foreach ($nonSpecialDetermination as $key => $value) {
-                if (!in_array($key, ['action', 'specialHook']) && ($counter == 0)) {
-                    $targetID     = $key;
-                    $targetTable  = $tableByID[$key];
-                    $listingQuery = $listingQueryByID[$key];
-                    $counter++;
+        $tableByID        = array_column($this->inElmnts['Menu'], 'Table', 'ID');
+        $listingQueryByID = array_column($this->inElmnts['Menu'], 'QueryListing', 'ID');
+        $counter          = 0;
+        foreach ($nonSpecialDetermination as $key => $value) {
+            if (($action == 'save') && ($key === 'ID')) {
+                $counter = 0;
+            }
+            if (!in_array($key, ['action', 'specialHook']) && ($counter == 0)) {
+                $targetID = $value; // add AND save
+                if (in_array($action, ['delete', 'edit'])) {
+                    $targetID = $key;
                 }
+                $this->appCache['svFromMenuWithID']['Table'] = $tableByID[$targetID];
+                $this->appCache['svFromMenuWithID']['Query'] = $listingQueryByID[$targetID];
+                $this->appCache['svFromMenuWithID']['Title'] = $this->localeSV('i18n_MenuItem_' . $targetID);
+                $counter++;
             }
         }
         if (in_array($action, ['add', 'edit'])) {
-            echo $this->setPerformActions($action, $targetID, $targetTable, $listingQuery);
+            echo $this->setPerformActions($action, $targetID);
             return '';
         }
         echo $this->setHeaderHtml($this->inElmnts['Application'], $this->inElmnts['Menu']);
         if ($action === '') {
             echo '<p>' . $this->tApp->gettext('i18n_WIP') . '</p>';
         } else {
-            echo $this->setPerformActions($action, $targetID, $targetTable, $listingQuery);
+            echo $this->setPerformActions($action, $targetID);
         }
         echo $this->setFooterHtml($this->inElmnts['Application']);
     }
@@ -153,8 +148,8 @@ class StructureValidated extends SQLqueries
         $string2return = '';
         switch ($type) {
             case 'insert':
-                $string2return = 'INSERT INTO `' . $tbl . '` (`' . implode('`', array_keys($fldVls))
-                    . '`) VALUES("' . implode('"', array_values($fldVls)) . '");';
+                $string2return = 'INSERT INTO `' . $tbl . '` (`' . implode('`, `', array_keys($fldVls))
+                    . '`) VALUES("' . implode('", "', array_values($fldVls)) . '");';
                 break;
             case 'update':
                 $whereSQL      = [];
@@ -196,42 +191,40 @@ class StructureValidated extends SQLqueries
                 . '"?action=" + a + "&" + b; } } }');
     }
 
-    private function setPerformActions($action, $targetID, $targetTable, $listingQuery)
+    private function setPerformActions($action, $targetID)
     {
         $sReturn = '';
         $this->connectToMySql($this->inElmnts['Database']);
         if (!defined('MYSQL_DATABASE')) {
             define('MYSQL_DATABASE', $this->inElmnts['Database']['database']);
         }
-        $this->getTableTranslatedFields(MYSQL_DATABASE, $targetTable);
+        $this->getTableTranslatedFields(MYSQL_DATABASE, $this->appCache['svFromMenuWithID']['Table']);
         $urlParts = [
             'ID=' . $targetID,
-            'T=' . $targetTable,
-            'Q=' . $listingQuery
         ];
         switch ($action) {
             case 'add':
                 $contentArray = [
                     $this->lclMsgCmn('i18n_NowYouAreInTheNewInformationAddingMode'),
-                    $this->setViewModernAdd($targetTable, $targetID, $action),
+                    $this->setViewModernAdd($this->appCache['svFromMenuWithID']['Table'], $targetID, $action),
                 ];
                 $sReturn      = $this->incapsulateContentForPredefinedActions($contentArray, $action);
                 break;
             case 'edit':
                 $contentArray = [
                     $this->lclMsgCmn('i18n_NowYouAreInTheEditingModeOfExistingInformations'),
-                    $this->setViewModernEdit($targetTable, $targetID, $action, null),
+                    $this->setViewModernEdit($this->appCache['svFromMenuWithID']['Table'], $targetID, $action, null),
                 ];
                 $sReturn      = $this->incapsulateContentForPredefinedActions($contentArray, $action);
                 break;
             case 'delete':
-                $sReturn      = $this->setViewModernDelete($targetTable, $targetID);
+                $sReturn      = $this->setViewModernDelete($this->appCache['svFromMenuWithID']['Table'], $targetID);
                 if ($this->mySQLconnection->affected_rows >= 0) {
                     echo $this->handlePageReload('?action=list&amp;' . implode('&amp;', $urlParts), 2);
                 }
                 break;
             case 'list':
-                $sReturn         = $this->setStandardDynamicContent($targetID, $targetTable, $listingQuery);
+                $sReturn         = $this->setStandardDynamicContent($targetID);
                 break;
             case 'save':
                 $finalJavascript = $this->setJavascriptContent(implode('', [
@@ -239,9 +232,8 @@ class StructureValidated extends SQLqueries
                     '$(this).remove();',
                     '});',
                 ]));
-                $sReturn         = $this->setViewModernSave($targetTable, $targetID)
-                    . '<div id="SaveFeedback">' . $this->appCache['saveFeedback'] . '</div>'
-                    . $finalJavascript;
+                $sReturn         = $this->setViewModernSave($this->appCache['svFromMenuWithID']['Table'], $targetID)
+                    . '<div id="SaveFeedback">' . $this->appCache['saveFeedback'] . '</div>' . $finalJavascript;
                 if ($this->mySQLconnection->affected_rows > 0) {
                     $sReturn .= $this->handlePageReload('?action=list&amp;' . implode('&amp;', $urlParts), 2);
                 } else {
@@ -254,13 +246,13 @@ class StructureValidated extends SQLqueries
         return $sReturn;
     }
 
-    private function setStandardDynamicContent($targetID, $targetTable, $listingQuery)
+    private function setStandardDynamicContent($targetID)
     {
         $sReturn   = [];
 //        $this->loadIntoCacheTheActionDetails($allActions[$el]);
         $sReturn[] = '<div class="tabbertab" id="tabList" title="' . $this->localeSV('i18n_ValuesList') . '">'
 //            . $this->handleDefaultValueForCertainPages()
-            . $this->setViewModernListEnhanced($targetID, $targetTable, $listingQuery)
+            . $this->setViewModernListEnhanced($targetID)
             . '</div><!-- from tabList -->';
         $sReturn[] = '<div class="tabbertab" id="tabDetails" title="' . $this->localeSV('i18n_ValuesDetails') . '">';
 //        $btns       = explode(',', $this->appCache['actDtls'][$allActions[$el]]['Rights']);
@@ -274,7 +266,7 @@ class StructureValidated extends SQLqueries
             . '<div class="tabber" id="' . $tabName . '">' . implode('', $sReturn) . '</div><!--from main tabber-->';
     }
 
-    public function setViewModernAdd($tbl, $identifier, $action = 'insert', $ftrs = null)
+    private function setViewModernAdd($tbl, $identifier, $action = 'insert', $ftrs = null)
     {
         $formFeatures = array_merge($this->setViewSanitizeFormFeatures($ftrs, ['hidden', 'readonly']), [
             'id'     => ('addForm' . date('YmdHis')),
@@ -286,8 +278,6 @@ class StructureValidated extends SQLqueries
             'action'    => 'save',
             'operation' => $action,
             'ID'        => $identifier,
-            'T'         => filter_var($this->tCmnSuperGlobals->get('T'), FILTER_SANITIZE_STRING),
-            'Q'         => filter_var($this->tCmnSuperGlobals->get('Q'), FILTER_SANITIZE_STRING),
         ]);
         if (isset($ftrs['additional_html'])) {
             $sReturn[] = $ftrs['additional_html'];
@@ -295,7 +285,7 @@ class StructureValidated extends SQLqueries
         return implode('', $sReturn);
     }
 
-    public function setViewModernEdit($tbl, $identifier, $action = 'edit', $ftrs = null)
+    private function setViewModernEdit($tbl, $identifier, $action = 'edit', $ftrs = null)
     {
         if (!isset($ftrs['skip_reading_existing_values'])) {
             $this->getRowDataFromTable($tbl, [
@@ -310,7 +300,7 @@ class StructureValidated extends SQLqueries
         return $this->setViewModernAdd($tbl, $identifier, $action, $ftrs);
     }
 
-    protected function setViewModernLinkAddSV($identifier, $ftrs = null)
+    private function setViewModernLinkAddSV($identifier, $ftrs = null)
     {
         $btnText     = '<i class="fa fa-plus-square">&nbsp;</i>' . '&nbsp;' . $this->lclMsgCmn('i18n_AddNewRecord');
         $tagFeatures = [
@@ -321,7 +311,7 @@ class StructureValidated extends SQLqueries
         return $this->setStringIntoTag($btnText, 'a', $tagFeatures);
     }
 
-    protected function setViewModernLinkAddInjectedArgumentsSV($ftrs = null)
+    private function setViewModernLinkAddInjectedArgumentsSV($ftrs = null)
     {
         $sArgmnts = '';
         if (isset($ftrs['injectAddArguments'])) {
@@ -332,7 +322,7 @@ class StructureValidated extends SQLqueries
         return $sArgmnts;
     }
 
-    protected function setViewModernLinkAddUrlSV($identifier, $ftrs = null)
+    private function setViewModernLinkAddUrlSV($identifier, $ftrs = null)
     {
         $sArgmnts  = $this->setViewModernLinkAddInjectedArgumentsSV($ftrs);
         $this->initializeSprGlbAndSession();
@@ -343,7 +333,7 @@ class StructureValidated extends SQLqueries
         return $addingUrl;
     }
 
-    private function setViewModernListEnhanced($targetID, $targetTable, $listingQuery, $ftrs = null)
+    private function setViewModernListEnhanced($targetID, $ftrs = null)
     {
         $rights  = ['add', 'delete', 'edit', 'list'];
         $sReturn = [];
@@ -353,9 +343,7 @@ class StructureValidated extends SQLqueries
             if (in_array('add', $rights)) {
                 $sReturn[] = $this->setViewModernLinkAddSV($targetID, [
                     'injectAddArguments' => [
-                        'lang' => $this->tCmnSession->get('lang'),
-                        'T'    => $targetTable,
-                        'Q'    => $listingQuery,
+                        'lang' => $this->tCmnSession->get('lang')
                     ]
                 ]);
             }
@@ -366,7 +354,7 @@ class StructureValidated extends SQLqueries
         if (isset($ftrs['forcedQuery'])) {
             $query = $this->storedQuery($ftrs['forcedQuery']);
         } else {
-            $query = $this->storedQuery('q' . $listingQuery);
+            $query = $this->storedQuery('q' . $this->appCache['svFromMenuWithID']['Query']);
         }
         if (isset($ftrs['query_match'])) {
             foreach ($ftrs['query_match'] as $key => $value) {
@@ -378,7 +366,8 @@ class StructureValidated extends SQLqueries
         }
         $ftrs['no_of_decimals'] = 0;
         $ftrs['hidden_columns'] = [
-            $this->advCache['tableStructureLocales'][MYSQL_DATABASE . '.' . $targetTable][$targetID],
+            $this->advCache['tableStructureLocales'][MYSQL_DATABASE . '.'
+            . $this->appCache['svFromMenuWithID']['Table']][$targetID],
             $targetID
         ];
         $listingBtns            = ['delete', 'edit'];
@@ -397,13 +386,13 @@ class StructureValidated extends SQLqueries
             $ftrs      = array_merge($ftrs, ['showGroupingCounter' => 1]);
             $sReturn[] = $this->setArrayToTable($dataArray, $ftrs);
         }
-        if (!isset($ftrs['noRecNoInfo'])) {
-            $sReturn[] = $this->getFeedbackMySQLAffectedRecords();
-        }
+//        if (!isset($ftrs['noRecNoInfo'])) {
+//            $sReturn[] = $this->getFeedbackMySQLAffectedRecords();
+//        }
         return implode('', $sReturn);
     }
 
-    public function setViewModernSave($tbl, $identifier, $ftrs = null)
+    private function setViewModernSave($tbl, $identifier, $ftrs = null)
     {
         $array2save          = [];
         $elementsToEliminate = [

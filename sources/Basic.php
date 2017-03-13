@@ -117,8 +117,8 @@ trait Basic
     {
         return '</section>' . $this->setFooterCommon(''
                 . $this->setUpperRightBoxLanguages($appSettings['Available Languages'])
-                . '<footer class="resetOnly author">&copy; ' . $appSettings['Copyright Holder'] . ', ' . date('Y')
-                . '</footer>');
+                . '<footer class="resetOnly author">' . $appSettings['Name'] . '&nbsp;&copy; '
+                . $appSettings['Copyright Holder'] . ', ' . date('Y') . '</footer>');
     }
 
     protected function setHeaderHtml($appSettings, $menuSettings)
@@ -133,7 +133,8 @@ trait Basic
         ];
         return $this->setHeaderCommon($headerParameters)
             . '<div id="SVmenu">' . $this->setMenu($menuSettings) . '</div><!-- main-menu end -->' . $this->setMenuJS()
-            . '<header id="PageHeader">' . '<h1>' . $appSettings['Name'] . '</h1>' . '</header>'
+            . '<header id="PageHeader">' . '<h1>' . $this->appCache['svFromMenuWithID']['Title'] . '</h1>'
+            . '</header>'
             . '<section id="ContentContainer">';
     }
 
@@ -149,8 +150,7 @@ trait Basic
                     $sRtrn[] = '<h2><i class="' . $remember['Icon'] . '"></i>'
                         . $this->localeSVextended($remember['ID'], ['prefix' => 'i18n_MenuItem_']) . '</h2><ul>';
                 }
-                $sRtrn[] = $this->setMenuPattern('', $val['LinkPrefix'] . $val['ID'] . '&amp;T=' . $val['Table']
-                    . '&amp;Q=' . $val['QueryListing'], $val['Icon'], $val['ID']);
+                $sRtrn[] = $this->setMenuPattern('', $val['LinkPrefix'] . $val['ID'], $val['Icon'], $val['ID']);
             }
             $remember = $val;
         }
@@ -199,6 +199,9 @@ trait Basic
 
     protected function setViewSanitizeFormFeatures($ftrs, $knownFeatures)
     {
+        if (is_null($ftrs)) {
+            return $knownFeatures;
+        }
         $featuresResulted = [];
         foreach ($knownFeatures as $value) {
             if (array_key_exists($value, $ftrs)) {

@@ -31,7 +31,20 @@ class SQLqueries
 
     use \danielgp\structure_validated\Basic;
 
-    private function qInformationSourceList()
+    private function qDimensionMarketList()
+    {
+        return 'SELECT '
+            . implode(', ', [
+                '`dm`.`MarketID`',
+                '`dm`.`MarketID`' . $this->setFieldLocalized('dimension_market', 'MarketID'),
+                '`dm`.`MarketName`' . $this->setFieldLocalized('dimension_market', 'MarketName'),
+            ])
+            . 'FROM `dimension_market` `dm` '
+            . 'GROUP BY `dm`.`MarketName` '
+            . 'ORDER BY `dm`.`MarketName`;';
+    }
+
+    private function qDimensionInformationSourceList()
     {
         return 'SELECT '
             . implode(', ', [
@@ -46,20 +59,7 @@ class SQLqueries
             . 'ORDER BY `dis`.`InformationSourceName`;';
     }
 
-    private function qDimensionMarketList()
-    {
-        return 'SELECT '
-            . implode(', ', [
-                '`dm`.`MarketID`',
-                '`dm`.`MarketID`' . $this->setFieldLocalized('dimension_market', 'MarketID'),
-                '`dm`.`MarketName`' . $this->setFieldLocalized('dimension_market', 'MarketName'),
-            ])
-            . 'FROM `dimension_market` `dm` '
-            . 'GROUP BY `dm`.`MarketName` '
-            . 'ORDER BY `dm`.`MarketName`;';
-    }
-
-    private function qTargetScenarioList()
+    private function qDimensionTargetScenarioList()
     {
         return 'SELECT '
             . implode(', ', [
@@ -78,20 +78,63 @@ class SQLqueries
             . 'ORDER BY `dts`.`TargetScenarioName`;';
     }
 
-    private function qTemplateTypeList()
+    private function qInternalTemplateTypeList()
     {
         return 'SELECT '
             . implode(', ', [
                 '`tt`.`TemplateTypeID`',
                 '`tt`.`TemplateTypeID`' . $this->setFieldLocalized('template_type', 'TemplateTypeID'),
                 '`tt`.`TemplateTypeName`' . $this->setFieldLocalized('template_type', 'TemplateTypeName'),
-                '`tt`.`TemplateStagingTable`' . $this->setFieldLocalized('template_type', 'TemplateStagingTable'),
-                '`tt`.`TemplateDestinationTable`'
-                . $this->setFieldLocalized('template_type', 'TemplateDestinationTable'),
+                '`tms`.`TableNameMeasureStaging`' . $this->setFieldLocalized('template_type', 'TableMeasureStagingID'),
+                '`tmr`.`TableNameMeasureReporting`'
+                . $this->setFieldLocalized('template_type', 'TableMeasureReportingID'),
             ])
             . 'FROM `template_type` `tt` '
+            . 'INNER JOIN `table_measure_staging` `tms` '
+            . 'ON `tt`.`TableMeasureStagingID` = `tms`.`TableMeasureStagingID` '
+            . 'INNER JOIN `table_measure_reporting` `tmr` '
+            . 'ON `tt`.`TableMeasureReportingID` = `tmr`.`TableMeasureReportingID` '
             . 'GROUP BY `tt`.`TemplateTypeName` '
             . 'ORDER BY `tt`.`TemplateTypeName`;';
+    }
+
+    private function qInternalTableDimensionList()
+    {
+        return 'SELECT '
+            . implode(', ', [
+                '`td`.`TableDimensionID`',
+                '`td`.`TableDimensionID`' . $this->setFieldLocalized('table_dimension', 'TableDimensionID'),
+                '`td`.`TableNameDimension`' . $this->setFieldLocalized('table_dimension', 'TableNameDimension'),
+            ])
+            . 'FROM `table_dimension` `td` '
+            . 'GROUP BY `td`.`TableNameDimension` '
+            . 'ORDER BY `td`.`TableNameDimension`;';
+    }
+
+    private function qInternalTableMeasureStagingList()
+    {
+        return 'SELECT '
+            . implode(', ', [
+                '`tms`.`TableMeasureStagingID`',
+                '`tms`.`TableMeasureStagingID`' . $this->setFieldLocalized('table_measure_staging', 'TableMeasureStagingID'),
+                '`tms`.`TableNameMeasureStaging`' . $this->setFieldLocalized('table_measure_staging', 'TableNameMeasureStaging'),
+            ])
+            . 'FROM `table_measure_staging` `tms` '
+            . 'GROUP BY `tms`.`TableNameMeasureStaging` '
+            . 'ORDER BY `tms`.`TableNameMeasureStaging`;';
+    }
+
+    private function qInternalTableMeasureReportingList()
+    {
+        return 'SELECT '
+            . implode(', ', [
+                '`tmr`.`TableMeasureReportingID`',
+                '`tmr`.`TableMeasureReportingID`' . $this->setFieldLocalized('table_measure_reporting', 'TableMeasureReportingID'),
+                '`tmr`.`TableNameMeasureReporting`' . $this->setFieldLocalized('table_measure_reporting', 'TableNameMeasureReporting'),
+            ])
+            . 'FROM `table_measure_reporting` `tmr` '
+            . 'GROUP BY `tmr`.`TableNameMeasureReporting` '
+            . 'ORDER BY `tmr`.`TableNameMeasureReporting`;';
     }
 
     private function qValidationFieldList()
@@ -102,7 +145,7 @@ class SQLqueries
                 '`vf`.`FieldID`' . $this->setFieldLocalized('validation_field', 'FieldID'),
                 '`vf`.`FieldName`' . $this->setFieldLocalized('validation_field', 'FieldName'),
             ])
-            . 'FROM `validation_field` `vf'
+            . 'FROM `validation_field` `vf` '
             . 'GROUP BY `vf`.`FieldName` '
             . 'ORDER BY `vf`.`FieldName`;';
     }
