@@ -85,6 +85,9 @@ msgstr ""
 msgid "i18n_MySQL_Field__dimension_target_scenario|TargetScenarioInLockTimestamp"
 msgstr ""
 
+msgid "i18n_MySQL_Field__dimension_target_scenario|~TargetScenarioEditingAllowedTimeRange"
+msgstr ""
+
 msgid "i18n_MySQL_Field__table_dimension|TableDimensionID"
 msgstr ""
 

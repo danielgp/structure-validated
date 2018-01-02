@@ -1,4 +1,7 @@
-$borderColor:#295685;
+$MLPMborderColor:#00ff99;
+$MLPMbackgroundColorBack:#0000ff;
+$MLPMboxShaddowColor:#00ff99;
+$MLPMbackgroundColorLevel:#1E69DE;
 .multilevelpushmenu_wrapper {
     margin: 0;
     min-height: 100%;
@@ -7,8 +10,8 @@ $borderColor:#295685;
     padding: 0;
     position: absolute;
     .backItemClass {
-        background: #2e6196;
-        border-top: 1px solid #{$borderColor};
+        background: #{$MLPMbackgroundColorBack};
+        border-top: 1px solid #{$MLPMborderColor};
         display: block;
         font-style: italic;
         padding: .1em;
@@ -33,7 +36,7 @@ $borderColor:#295685;
         padding: 0 0 0 .4em;
     }
     .levelHolderClass {
-        background: #336ca6;
+        background: #{$MLPMbackgroundColorLevel};
         display: block;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 1em;
@@ -49,21 +52,21 @@ $borderColor:#295685;
     .ltr {
         left: 0;
         margin-left: -100%;
-        -moz-box-shadow: 5px 0 5px -5px #1f4164;
-        -webkit-box-shadow: 5px 0 5px -5px #1f4164;
-        box-shadow: 5px 0 5px -5px #1f4164;
-        filter: progid:DXImageTransform.Microsoft.Shadow(color=#1f4164,direction=90,strength=2);
+        -moz-box-shadow: 5px 0 5px -5px #{$MLPMboxShaddowColor};
+        -webkit-box-shadow: 5px 0 5px -5px #{$MLPMboxShaddowColor};
+        box-shadow: 5px 0 5px -5px #{$MLPMboxShaddowColor};
+        filter: progid:DXImageTransform.Microsoft.Shadow(color=#{$MLPMboxShaddowColor},direction=90,strength=2);
     }
     .multilevelpushmenu_inactive {
-        background: #2e6196;
+        background: #{$MLPMbackgroundColorBack};
     }
     .rtl {
         margin-right: -100%;
         right: 0;
-        -moz-box-shadow: 5px 0 5px 5px #1f4164;
-        -webkit-box-shadow: 5px 0 5px 5px #1f4164;
-        box-shadow: 5px 0 5px 5px #1f4164;
-        filter: progid:DXImageTransform.Microsoft.Shadow(color=#1f4164,direction=270,strength=2);
+        -moz-box-shadow: 5px 0 5px 5px #{$MLPMboxShaddowColor};
+        -webkit-box-shadow: 5px 0 5px 5px #{$MLPMboxShaddowColor};
+        box-shadow: 5px 0 5px 5px #{$MLPMboxShaddowColor};
+        filter: progid:DXImageTransform.Microsoft.Shadow(color=#{$MLPMboxShaddowColor},direction=270,strength=2);
     }
     a {
         color: #fff;
@@ -77,24 +80,24 @@ $borderColor:#295685;
     }
     a:hover {
         color:#ff3 !important;
-        text-shadow: 1px 1px 1px #fff;
+        text-shadow: 1px 1px 1px #000;
     }
     h2 {
-        color: #1f4164;
+        color: #{$MLPMboxShaddowColor};
         font-size: 1.5em;
         font-weight: bold;
         line-height: 1em;
         padding: 0 .4em 0 .4em;
     }
     li {
-        border-top: 1px solid #{$borderColor};
+        border-top: 1px solid #{$MLPMborderColor};
         cursor: pointer;
     }
     li:hover {
-        background-color: #{$borderColor};
+        background-color: #{$MLPMborderColor};
     }
     li:last-child {
-        border-bottom: 1px solid #{$borderColor};
+        border-bottom: 1px solid #{$MLPMborderColor};
     }
     ul {
         list-style: none;

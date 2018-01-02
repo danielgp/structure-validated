@@ -68,14 +68,36 @@ class SQLqueries
                 . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioID'),
                 '`dts`.`TargetScenarioName`'
                 . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioName'),
-                '`dts`.`TargetScenarioInStartTimestamp`'
-                . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioInStartTimestamp'),
-                '`dts`.`TargetScenarioInLockTimestamp`'
-                . $this->setFieldLocalized('dimension_target_scenario', 'TargetScenarioInLockTimestamp'),
+                'REPLACE(REPLACE(REPLACE(CONCAT(DATE_FORMAT(`dts`.`TargetScenarioInStartTimestamp`, '
+                . '"%W, %D %M %Y, %H:%i"), " --- ", DATE_FORMAT(`dts`.`TargetScenarioInLockTimestamp`, '
+                . '"%W, %D %M %Y, %H:%i"))'
+                . ', "st ", "<sup>st</sup> "), "nd ", "<sup>nd</sup> "), "th ", "<sup>th</sup> ")'
+                . $this->setFieldLocalized('dimension_target_scenario', '~TargetScenarioEditingAllowedTimeRange'),
             ])
             . 'FROM `dimension_target_scenario` `dts` '
             . 'GROUP BY `dts`.`TargetScenarioName` '
             . 'ORDER BY `dts`.`TargetScenarioName`;';
+    }
+
+    private function qInternalTemplateLoadList()
+    {
+        return 'SELECT '
+            . implode(', ', [
+                '`tl`.`TemplateLoadID`',
+                '`tl`.`TemplateLoadID`' . $this->setFieldLocalized('template_loaded', 'TemplateLoadID'),
+                '`tl`.`TemplateComment`' . $this->setFieldLocalized('template_loaded', 'TemplateComment'),
+                'REPLACE(REPLACE(REPLACE(`tl`.`TemplateLoadDate`, "%W, %D %M %Y, %H:%i")'
+                . $this->setFieldLocalized('template_loaded', 'TemplateLoadDate'),
+                '`tmr`.`TemplateTypeID`'
+                . $this->setFieldLocalized('template_loaded', 'TemplateTypeID'),
+            ])
+            . 'FROM `template_loaded` `tl` '
+            . 'INNER JOIN `table_measure_staging` `tms` '
+            . 'ON `tt`.`TableMeasureStagingID` = `tms`.`TableMeasureStagingID` '
+            . 'INNER JOIN `table_measure_reporting` `tmr` '
+            . 'ON `tt`.`TableMeasureReportingID` = `tmr`.`TableMeasureReportingID` '
+            . 'GROUP BY `tt`.`TemplateTypeName` '
+            . 'ORDER BY `tt`.`TemplateTypeName`;';
     }
 
     private function qInternalTemplateTypeList()
@@ -116,8 +138,10 @@ class SQLqueries
         return 'SELECT '
             . implode(', ', [
                 '`tms`.`TableMeasureStagingID`',
-                '`tms`.`TableMeasureStagingID`' . $this->setFieldLocalized('table_measure_staging', 'TableMeasureStagingID'),
-                '`tms`.`TableNameMeasureStaging`' . $this->setFieldLocalized('table_measure_staging', 'TableNameMeasureStaging'),
+                '`tms`.`TableMeasureStagingID`'
+                . $this->setFieldLocalized('table_measure_staging', 'TableMeasureStagingID'),
+                '`tms`.`TableNameMeasureStaging`'
+                . $this->setFieldLocalized('table_measure_staging', 'TableNameMeasureStaging'),
             ])
             . 'FROM `table_measure_staging` `tms` '
             . 'GROUP BY `tms`.`TableNameMeasureStaging` '
@@ -129,8 +153,10 @@ class SQLqueries
         return 'SELECT '
             . implode(', ', [
                 '`tmr`.`TableMeasureReportingID`',
-                '`tmr`.`TableMeasureReportingID`' . $this->setFieldLocalized('table_measure_reporting', 'TableMeasureReportingID'),
-                '`tmr`.`TableNameMeasureReporting`' . $this->setFieldLocalized('table_measure_reporting', 'TableNameMeasureReporting'),
+                '`tmr`.`TableMeasureReportingID`'
+                . $this->setFieldLocalized('table_measure_reporting', 'TableMeasureReportingID'),
+                '`tmr`.`TableNameMeasureReporting`'
+                . $this->setFieldLocalized('table_measure_reporting', 'TableNameMeasureReporting'),
             ])
             . 'FROM `table_measure_reporting` `tmr` '
             . 'GROUP BY `tmr`.`TableNameMeasureReporting` '

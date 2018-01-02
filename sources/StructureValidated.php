@@ -48,9 +48,10 @@ class StructureValidated extends SQLqueries
         } elseif (in_array($action, ['add', 'delete', 'edit', 'list'])) {
             $nonSpecialDetermination = $this->tCmnSuperGlobals->query;
         }
-        $tableByID        = array_column($this->inElmnts['Menu'], 'Table', 'ID');
-        $listingQueryByID = array_column($this->inElmnts['Menu'], 'QueryListing', 'ID');
-        $counter          = 0;
+        $tableByID                                   = array_column($this->inElmnts['Menu'], 'Table', 'ID');
+        $listingQueryByID                            = array_column($this->inElmnts['Menu'], 'QueryListing', 'ID');
+        $counter                                     = 0;
+        $this->appCache['svFromMenuWithID']['Title'] = $this->inElmnts['Application']['Name'];
         foreach ($nonSpecialDetermination as $key => $value) {
             if (($action == 'save') && ($key === 'ID')) {
                 $counter = 0;
@@ -193,10 +194,11 @@ class StructureValidated extends SQLqueries
 
     private function setPerformActions($action, $targetID)
     {
-        $sReturn = '';
-        $this->connectToMySql($this->inElmnts['Database']);
+        $sReturn         = '';
+        $this->inBackEnd = $this->readTypeFromJsonFileStructureValidated('config', 'backendElements');
+        $this->connectToMySql($this->inBackEnd['Database']);
         if (!defined('MYSQL_DATABASE')) {
-            define('MYSQL_DATABASE', $this->inElmnts['Database']['database']);
+            define('MYSQL_DATABASE', $this->inBackEnd['Database']['database']);
         }
         $this->getTableTranslatedFields(MYSQL_DATABASE, $this->appCache['svFromMenuWithID']['Table']);
         $urlParts = [
@@ -341,11 +343,12 @@ class StructureValidated extends SQLqueries
             // no Add Icon will be displayed
         } elseif ($rights != null) {
             if (in_array('add', $rights)) {
-                $sReturn[] = $this->setViewModernLinkAddSV($targetID, [
-                    'injectAddArguments' => [
-                        'lang' => $this->tCmnSession->get('lang')
-                    ]
-                ]);
+//                $sReturn[] = $this->setViewModernLinkAddSV($targetID, [
+//                    'injectAddArguments' => [
+//                        'lang' => $this->tCmnSession->get('lang')
+//                    ]
+//                ]);
+                $sReturn[] = $this->setViewModernLinkAddSV($targetID);
             }
             if (in_array('delete', $rights)) {
                 $sReturn[] = $this->setJavascriptDeleteWithConfirmationSV();

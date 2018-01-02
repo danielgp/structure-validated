@@ -29,13 +29,6 @@
         },
         "Name": "Structure-Validated"
     },
-    "Database": {
-        "database": "structure_validated",
-        "host": "127.0.0.1",
-        "password": "YoTi3kh9RgHMCEtFgzuWCcxMPooEkA",
-        "port": "3306",
-        "username": "web_sv"
-    },
     "Interface": {
         "Gradients To Action": {
             "add": "gradientLightBlueDiagonal",
@@ -117,10 +110,18 @@
             "QueryListing": "DimensionTargetScenarioList",
             "Table": "dimension_target_scenario"
         },
-        "Data Load": {
-            "Icon": "fa fa-upload",
-            "ID": "DataLoad",
+        "Content": {
+            "Icon": "fa fa-cloud",
+            "ID": "Content",
             "Parent": true
+        },
+        "Template Load": {
+            "Icon": "fa fa-upload",
+            "ID": "TemplateLoadID",
+            "LinkPrefix": "?action=list&amp;ID=",
+            "Parent": "Content",
+            "QueryListing": "InternalTemplateLoadList",
+            "Table": "template_loaded"
         }
     }
 }

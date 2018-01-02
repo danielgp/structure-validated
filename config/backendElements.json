@@ -1,0 +1,9 @@
+{
+    "Database": {
+        "database": "structure_validated",
+        "host": "127.0.0.1",
+        "password": "YoTi3kh9RgHMCEtFgzuWCcxMPooEkA",
+        "port": "3306",
+        "username": "web_sv"
+    }
+}
