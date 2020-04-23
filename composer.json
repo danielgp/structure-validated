@@ -11,12 +11,12 @@
         }
     ],
     "require": {
-        "php": "^7.0 || ^7.1",
-        "components/flag-icon-css": ">=2.8.0",
+        "php": "^7.2 || ^7.3 || ^7.4",
+        "components/flag-icon-css": "^3",
         "components/jquery": ">=2.2,<3.0",
         "components/jqueryui": "1.11.4",
-        "danielgp/common-lib": ">=3.0",
-        "danielgp/common-styles": ">=1.1.6",
+        "danielgp/common-lib": "^3",
+        "danielgp/common-styles": "^1",
         "fortawesome/font-awesome": ">=4.7",
         "gettext/gettext": ">=4.3",
         "phpoffice/phpexcel": ">=1.8"
